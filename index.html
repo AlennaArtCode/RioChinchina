@@ -238,7 +238,7 @@
   <!-- ════════════════════════════════ SIDEBAR -->
   <aside id="sidebar">
     <div class="s-head">
-      <div class="badge">🛰 GEE · Landsat · MNDWI</div>
+      <div class="badge">🛰 GEE · S-2/JRC · v6</div>
       <h1>Río Chinchiná<br/>Evolución del Cauce</h1>
       <p>Cuenca hidrográfica · Caldas, Colombia<br/>Parque Los Nevados → Río Cauca</p>
     </div>
@@ -249,7 +249,7 @@
       <div class="drop-zone" id="dropZone">
         <input type="file" id="fileInput" accept=".kml" multiple/>
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-        <p><span>Clic</span> o arrastra los 4 KML<br/><small style="font-size:9px;color:#475569">cauce_rio_chinchina_2006.kml…</small></p>
+        <p><span>Clic</span> o arrastra los 4 KML<br/><small style="font-size:9px;color:#475569">cauce_rio_chinchina_2006_v6.kml…</small></p>
       </div>
     </div>
 
@@ -350,10 +350,10 @@
     <div class="sec">
       <div class="sec-t">ℹ Metodología</div>
       <div style="font-size:10px;color:var(--muted2);line-height:1.7;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:10px 11px">
-        <b style="color:var(--text)">v3:</b> JRC Global Surface Water (2006–2018)<br/>
-        <b style="color:var(--text)">v3:</b> MNDWI&gt;0.08 + corredor 5km OSM (2026)<br/>
-        Resolución: <b style="color:var(--accent)">30 m</b> · Procesamiento: <b style="color:var(--text)">GEE</b><br/>
-        Fuente: <b style="color:var(--text)">NASA/Google JRC · CORPOCALDAS · POMCA</b>
+        <b style="color:var(--text)">v6:</b> JRC Yearly (2006/2012) · Res: 30m<br/>
+        <b style="color:var(--text)">v6:</b> S2 MNDWI&gt;=0.05 (2018/2026) · Res: 10m<br/>
+        Corredor: <b style="color:var(--accent)">800 m buffer</b> desde OSM oficial<br/>
+        Procesamiento: <b style="color:var(--text)">Google Earth Engine (GEE)</b>
       </div>
     </div>
 
@@ -379,10 +379,10 @@
       <!-- Legend -->
       <div id="legend">
         <div class="leg-t">Cauce por año</div>
-        <div class="leg-i"><div class="leg-l" style="background:var(--c06)"></div>2006 · Landsat 5</div>
-        <div class="leg-i"><div class="leg-l" style="background:var(--c12)"></div>2012 · Landsat 7</div>
-        <div class="leg-i"><div class="leg-l" style="background:var(--c18)"></div>2018 · Landsat 8</div>
-        <div class="leg-i"><div class="leg-l" style="background:var(--c26)"></div>2026 · Landsat 9</div>
+        <div class="leg-i"><div class="leg-l" style="background:var(--c06)"></div>2006 · JRC (Landsat 5)</div>
+        <div class="leg-i"><div class="leg-l" style="background:var(--c12)"></div>2012 · JRC (Landsat 7)</div>
+        <div class="leg-i"><div class="leg-l" style="background:var(--c18)"></div>2018 · S-2 (10m)</div>
+        <div class="leg-i"><div class="leg-l" style="background:var(--c26)"></div>2026 · S-2 (10m)</div>
         <div class="leg-i" id="osmLegendRow" style="display:none">
           <div class="leg-l" style="background:#fff;border-top:2px dashed #fff"></div>
           Río Chinchiná (OSM oficial)
@@ -443,10 +443,10 @@
 //  CONFIG
 // ═══════════════════════════════════════════════════════════
 const YEARS = [
-  {year:2006, sat:'Landsat 5 TM',    color:'#f59e0b'},
-  {year:2012, sat:'Landsat 7 ETM+',  color:'#f97316'},
-  {year:2018, sat:'Landsat 8 OLI',   color:'#22d3ee'},
-  {year:2026, sat:'Landsat 9 OLI-2', color:'#34d399'},
+  {year:2006, sat:'JRC (Landsat 5)',   color:'#f59e0b'},
+  {year:2012, sat:'JRC (Landsat 7)',   color:'#f97316'},
+  {year:2018, sat:'Sentinel-2 (10m)',  color:'#22d3ee'},
+  {year:2026, sat:'Sentinel-2 (10m)',  color:'#34d399'},
 ];
 
 const POIS = [
