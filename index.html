@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Río Chinchiná — Análisis Multitemporal del Cauce</title>
+  <meta name="description" content="Visualización interactiva del trazado histórico del Río Chinchiná, Caldas, Colombia (2006–2026) usando imágenes satelitales Landsat." />
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── RESET & BASE ───────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:         #0a0e1a;
+      --surface:    #111827;
+      --surface2:   #1a2235;
+      --border:     rgba(255,255,255,0.07);
+      --text:       #e2e8f0;
+      --muted:      #94a3b8;
+      --accent:     #38bdf8;
+
+      --c2006: #f59e0b;   /* ámbar */
+      --c2012: #f97316;   /* naranja */
+      --c2018: #22d3ee;   /* cian */
+      --c2026: #34d399;   /* esmeralda */
+    }
+
+    html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
+
+    /* ── LAYOUT ─────────────────────────────────────────────── */
+    #app { display: flex; height: 100vh; }
+
+    /* ── SIDEBAR ────────────────────────────────────────────── */
+    #sidebar {
+      width: 320px; min-width: 320px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      overflow-y: auto;
+      z-index: 10;
+    }
+
+    .sidebar-header {
+      padding: 24px 20px 16px;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-header .badge {
+      display: inline-block;
+      background: rgba(56,189,248,0.15);
+      border: 1px solid rgba(56,189,248,0.3);
+      color: var(--accent);
+      font-size: 10px; font-weight: 600; letter-spacing: 1.5px;
+      text-transform: uppercase; padding: 3px 8px; border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    .sidebar-header h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 18px; font-weight: 700; line-height: 1.3;
+      color: #f1f5f9;
+    }
+    .sidebar-header p {
+      font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.5;
+    }
+
+    /* ── UPLOAD ZONE ────────────────────────────────────────── */
+    .section { padding: 16px 20px; border-bottom: 1px solid var(--border); }
+    .section-title {
+      font-size: 10px; font-weight: 600; letter-spacing: 1.2px;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 12px;
+    }
+
+    .upload-zone {
+      border: 2px dashed rgba(56,189,248,0.3);
+      border-radius: 10px;
+      padding: 20px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .2s;
+      background: rgba(56,189,248,0.03);
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--accent);
+      background: rgba(56,189,248,0.08);
+    }
+    .upload-zone svg { opacity: .5; margin-bottom: 8px; }
+    .upload-zone p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .upload-zone span { color: var(--accent); font-weight: 500; }
+    #fileInput { display: none; }
+
+    /* ── YEAR CARDS ─────────────────────────────────────────── */
+    .year-cards { display: flex; flex-direction: column; gap: 8px; }
+
+    .year-card {
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      overflow: hidden;
+      transition: all .2s;
+    }
+    .year-card.loaded { border-color: rgba(255,255,255,0.12); }
+    .year-card.active { box-shadow: 0 0 0 1.5px var(--year-color); border-color: var(--year-color); }
+
+    .year-card-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; cursor: pointer;
+    }
+    .year-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--year-color); flex-shrink: 0;
+      box-shadow: 0 0 8px var(--year-color);
+    }
+    .year-label { font-size: 14px; font-weight: 600; flex: 1; }
+    .year-sat { font-size: 10px; color: var(--muted); }
+    .year-toggle {
+      width: 36px; height: 20px; border-radius: 10px;
+      background: rgba(255,255,255,0.1); position: relative;
+      cursor: pointer; transition: background .2s; flex-shrink: 0;
+      border: none;
+    }
+    .year-toggle::after {
+      content: ''; position: absolute;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: #fff; top: 3px; left: 3px;
+      transition: transform .2s;
+    }
+    .year-toggle.on { background: var(--year-color); }
+    .year-toggle.on::after { transform: translateX(16px); }
+
+    .year-status {
+      font-size: 10px; color: var(--muted);
+      padding: 0 12px 8px; display: flex; align-items: center; gap: 4px;
+    }
+    .year-status.ok { color: #34d399; }
+    .year-status.waiting { color: var(--muted); }
+
+    /* ── STATS ──────────────────────────────────────────────── */
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .stat-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 12px;
+    }
+    .stat-val { font-size: 18px; font-weight: 700; color: var(--accent); }
+    .stat-lbl { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+    /* ── BASEMAP ────────────────────────────────────────────── */
+    .basemap-btns { display: flex; gap: 6px; }
+    .basemap-btn {
+      flex: 1; padding: 7px 4px; font-size: 11px; font-weight: 500;
+      border-radius: 6px; border: 1px solid var(--border);
+      background: var(--surface2); color: var(--muted);
+      cursor: pointer; transition: all .15s; text-align: center;
+    }
+    .basemap-btn.active {
+      background: rgba(56,189,248,0.15);
+      border-color: var(--accent); color: var(--accent);
+    }
+
+    /* ── OPACITY SLIDER ─────────────────────────────────────── */
+    .opacity-row { display: flex; align-items: center; gap: 10px; }
+    .opacity-row label { font-size: 11px; color: var(--muted); white-space: nowrap; }
+    input[type=range] {
+      flex: 1; -webkit-appearance: none; height: 4px;
+      background: var(--border); border-radius: 2px; outline: none;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 14px; height: 14px;
+      border-radius: 50%; background: var(--accent); cursor: pointer;
+    }
+
+    /* ── INFO BOX ───────────────────────────────────────────── */
+    .info-box {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 12px; font-size: 11px;
+      color: var(--muted); line-height: 1.6;
+    }
+    .info-box strong { color: var(--text); }
+
+    /* ── FOOTER ─────────────────────────────────────────────── */
+    .sidebar-footer {
+      margin-top: auto; padding: 14px 20px;
+      border-top: 1px solid var(--border);
+      font-size: 10px; color: var(--muted); text-align: center;
+    }
+
+    /* ── MAP ────────────────────────────────────────────────── */
+    #map { flex: 1; z-index: 1; }
+
+    /* ── MAP OVERLAY CONTROLS ───────────────────────────────── */
+    .map-pill {
+      position: absolute; z-index: 500;
+      background: rgba(10,14,26,0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 10px; padding: 8px 14px;
+      font-size: 12px; color: var(--text);
+    }
+    #map-title { top: 16px; left: 16px; font-weight: 600; font-size: 13px; }
+    #map-coords { bottom: 30px; right: 16px; font-size: 11px; color: var(--muted); }
+
+    /* ── LEGEND ─────────────────────────────────────────────── */
+    #legend {
+      position: absolute; bottom: 30px; left: 16px; z-index: 500;
+      background: rgba(10,14,26,0.88);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 16px;
+    }
+    #legend .leg-title { font-size: 10px; font-weight: 600; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+    .leg-item { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 12px; }
+    .leg-line { width: 24px; height: 3px; border-radius: 2px; }
+
+    /* ── TOAST ──────────────────────────────────────────────── */
+    #toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: #1e293b; border: 1px solid var(--accent);
+      color: var(--text); padding: 10px 20px; border-radius: 8px;
+      font-size: 13px; z-index: 9999; opacity: 0;
+      transition: opacity .3s; pointer-events: none;
+    }
+    #toast.show { opacity: 1; }
+
+    /* ── LOADER ─────────────────────────────────────────────── */
+    .loader {
+      display: inline-block; width: 10px; height: 10px;
+      border: 2px solid rgba(255,255,255,0.1);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Leaflet dark override */
+    .leaflet-control-zoom a { background: #1a2235 !important; color: #94a3b8 !important; border-color: #2d3748 !important; }
+    .leaflet-control-zoom a:hover { background: #253044 !important; color: #e2e8f0 !important; }
+    .leaflet-control-attribution { background: rgba(10,14,26,0.7) !important; color: #475569 !important; }
+    .leaflet-control-attribution a { color: #64748b !important; }
+
+    /* Responsive */
+    @media (max-width: 680px) {
+      #sidebar { width: 100%; min-width: unset; height: 55vh; border-right: none; border-bottom: 1px solid var(--border); overflow-y: auto; }
+      #app { flex-direction: column; }
+      #map { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ═══════════════════════════════════════════════════════ SIDEBAR -->
+  <aside id="sidebar">
+
+    <div class="sidebar-header">
+      <div class="badge">🛰 Análisis GEE · Landsat</div>
+      <h1>Río Chinchiná<br/>Evolución del Cauce</h1>
+      <p>Cuenca hidrográfica de Caldas, Colombia · Parque Los Nevados → Río Cauca</p>
+    </div>
+
+    <!-- CARGAR KML -->
+    <div class="section">
+      <div class="section-title">📂 Cargar archivos KML</div>
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" id="fileInput" accept=".kml" multiple />
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.5">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+        </svg>
+        <p><span>Haz clic</span> o arrastra aquí<br/>los 4 archivos KML descargados<br/><small style="font-size:10px">(cauce_rio_chinchina_2006.kml, etc.)</small></p>
+      </div>
+    </div>
+
+    <!-- CAPAS POR AÑO -->
+    <div class="section">
+      <div class="section-title">🗂 Capas por año</div>
+      <div class="year-cards" id="yearCards">
+        <!-- generado por JS -->
+      </div>
+    </div>
+
+    <!-- OPCIONES DE MAPA -->
+    <div class="section">
+      <div class="section-title">🗺 Mapa base</div>
+      <div class="basemap-btns">
+        <button class="basemap-btn" id="btn-satellite" onclick="setBasemap('satellite')">🛰 Satélite</button>
+        <button class="basemap-btn active" id="btn-dark" onclick="setBasemap('dark')">🌑 Oscuro</button>
+        <button class="basemap-btn" id="btn-topo" onclick="setBasemap('topo')">🏔 Topo</button>
+      </div>
+    </div>
+
+    <!-- OPACIDAD -->
+    <div class="section">
+      <div class="section-title">🔆 Opacidad de capas</div>
+      <div class="opacity-row">
+        <label>Trazados</label>
+        <input type="range" id="opacitySlider" min="10" max="100" value="85" oninput="updateOpacity(this.value)" />
+        <label id="opacityVal">85%</label>
+      </div>
+    </div>
+
+    <!-- ESTADÍSTICAS -->
+    <div class="section">
+      <div class="section-title">📊 Estadísticas</div>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-val" id="stat-layers">0/4</div>
+          <div class="stat-lbl">Capas cargadas</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="stat-feats">—</div>
+          <div class="stat-lbl">Polígonos totales</div>
+        </div>
+        <div class="stat-box" style="grid-column:1/-1">
+          <div class="stat-val" style="font-size:13px" id="stat-area">Carga los KML para ver stats</div>
+          <div class="stat-lbl">Área de análisis</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INFO -->
+    <div class="section">
+      <div class="section-title">ℹ️ Metodología</div>
+      <div class="info-box">
+        <strong>Índice MNDWI</strong> · Detección de agua superficial<br/>
+        <strong>Landsat 5/7/8/9</strong> · Resolución 30 m<br/>
+        <strong>GEE · Google Earth Engine</strong> · Procesamiento en nube<br/>
+        <strong>Cuenca:</strong> ~1.052 km² | Alt. 860–5.200 m s.n.m.
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      Alenna Art Code · 2026 · Google Earth Engine API
+    </div>
+
+  </aside>
+
+  <!-- ═══════════════════════════════════════════════════════ MAPA -->
+  <div style="position:relative; flex:1;">
+    <div id="map"></div>
+
+    <!-- Título flotante -->
+    <div class="map-pill" id="map-title">
+      🌊 Río Chinchiná · Caldas, Colombia
+    </div>
+
+    <!-- Coordenadas -->
+    <div class="map-pill" id="map-coords">—</div>
+
+    <!-- Leyenda -->
+    <div id="legend">
+      <div class="leg-title">Cauce por año</div>
+      <div class="leg-item"><div class="leg-line" style="background:var(--c2006)"></div>2006 · Landsat 5</div>
+      <div class="leg-item"><div class="leg-line" style="background:var(--c2012)"></div>2012 · Landsat 7</div>
+      <div class="leg-item"><div class="leg-line" style="background:var(--c2018)"></div>2018 · Landsat 8</div>
+      <div class="leg-item"><div class="leg-line" style="background:var(--c2026)"></div>2026 · Landsat 9</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  CONFIGURACIÓN
+// ═══════════════════════════════════════════════════════════════
+const YEARS = [
+  { year: 2006, sat: 'Landsat 5 TM',   color: '#f59e0b' },
+  { year: 2012, sat: 'Landsat 7 ETM+', color: '#f97316' },
+  { year: 2018, sat: 'Landsat 8 OLI',  color: '#22d3ee' },
+  { year: 2026, sat: 'Landsat 9 OLI-2',color: '#34d399' },
+];
+
+// Centro de la cuenca Río Chinchiná
+const CENTER = [5.0, -75.62];
+const ZOOM   = 11;
+
+// ═══════════════════════════════════════════════════════════════
+//  ESTADO
+// ═══════════════════════════════════════════════════════════════
+const state = {
+  layers:   {},   // { 2006: L.geoJSON, ... }
+  visible:  { 2006: true, 2012: true, 2018: true, 2026: true },
+  opacity:  0.85,
+  loaded:   {},   // { 2006: true/false, ... }
+  feats:    {},   // { 2006: N, ... }
+  basemap:  'dark',
+};
+
+// ═══════════════════════════════════════════════════════════════
+//  MAPA
+// ═══════════════════════════════════════════════════════════════
+const map = L.map('map', {
+  center: CENTER, zoom: ZOOM,
+  zoomControl: true,
+  attributionControl: true,
+});
+
+const basemaps = {
+  dark: L.tileLayer(
+    'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+    { attribution: '© CartoDB', maxZoom: 19 }
+  ),
+  satellite: L.tileLayer(
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    { attribution: '© Esri', maxZoom: 19 }
+  ),
+  topo: L.tileLayer(
+    'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+    { attribution: '© OpenTopoMap', maxZoom: 17 }
+  ),
+};
+basemaps.dark.addTo(map);
+
+// Coordenadas en mapa
+map.on('mousemove', e => {
+  document.getElementById('map-coords').textContent =
+    `${e.latlng.lat.toFixed(5)}° N  ${e.latlng.lng.toFixed(5)}° W`;
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  YEAR CARDS
+// ═══════════════════════════════════════════════════════════════
+const container = document.getElementById('yearCards');
+
+YEARS.forEach(({ year, sat, color }) => {
+  const card = document.createElement('div');
+  card.className = 'year-card';
+  card.id = `card-${year}`;
+  card.style.setProperty('--year-color', color);
+  card.innerHTML = `
+    <div class="year-card-header">
+      <div class="year-dot"></div>
+      <div>
+        <div class="year-label">${year}</div>
+        <div class="year-sat">${sat}</div>
+      </div>
+      <button class="year-toggle on" id="toggle-${year}" onclick="toggleYear(${year}, this)" title="Mostrar/ocultar"></button>
+    </div>
+    <div class="year-status waiting" id="status-${year}">
+      <span>Esperando archivo KML...</span>
+    </div>`;
+  container.appendChild(card);
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  DRAG & DROP / FILE INPUT
+// ═══════════════════════════════════════════════════════════════
+const uploadZone = document.getElementById('uploadZone');
+const fileInput  = document.getElementById('fileInput');
+
+uploadZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => handleFiles(e.target.files));
+
+uploadZone.addEventListener('dragover', e => {
+  e.preventDefault(); uploadZone.classList.add('drag-over');
+});
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault(); uploadZone.classList.remove('drag-over');
+  handleFiles(e.dataTransfer.files);
+});
+
+function handleFiles(files) {
+  [...files].forEach(file => {
+    const match = file.name.match(/(\d{4})/);
+    if (!match) return;
+    const year = parseInt(match[1]);
+    if (!YEARS.find(y => y.year === year)) return;
+
+    const reader = new FileReader();
+    reader.onload = e => loadKML(year, e.target.result);
+    reader.readAsText(file);
+    setStatus(year, 'loading', '');
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  CARGAR KML → GeoJSON
+// ═══════════════════════════════════════════════════════════════
+function loadKML(year, kmlText) {
+  try {
+    const parser  = new DOMParser();
+    const xmlDoc  = parser.parseFromString(kmlText, 'text/xml');
+    const geojson = kmlToGeoJSON(xmlDoc);
+
+    if (state.layers[year]) {
+      map.removeLayer(state.layers[year]);
+    }
+
+    const cfg = YEARS.find(y => y.year === year);
+
+    const layer = L.geoJSON(geojson, {
+      style: {
+        color:       cfg.color,
+        fillColor:   cfg.color,
+        fillOpacity: state.opacity * 0.4,
+        weight:      2,
+        opacity:     state.opacity,
+      },
+      onEachFeature: (feature, lyr) => {
+        lyr.bindPopup(`
+          <div style="font-family:Inter,sans-serif;min-width:160px">
+            <div style="font-weight:700;font-size:14px;margin-bottom:4px">
+              <span style="color:${cfg.color}">●</span> Cauce ${year}
+            </div>
+            <div style="font-size:11px;color:#666">${cfg.sat}</div>
+            <div style="font-size:11px;color:#666;margin-top:4px">
+              Índice: MNDWI > 0.05
+            </div>
+          </div>`);
+      }
+    }).addTo(map);
+
+    state.layers[year]  = layer;
+    state.loaded[year]  = true;
+    state.feats[year]   = geojson.features?.length || 0;
+
+    const card = document.getElementById(`card-${year}`);
+    card.classList.add('loaded', 'active');
+
+    setStatus(year, 'ok', `✓ ${state.feats[year]} polígonos cargados`);
+    updateStats();
+    showToast(`✅ ${year} cargado · ${state.feats[year]} polígonos`);
+
+    // Zoom al primer año cargado
+    const loaded = Object.values(state.layers).filter(Boolean);
+    if (loaded.length === 1) map.fitBounds(layer.getBounds(), { padding: [40,40] });
+
+  } catch(err) {
+    setStatus(year, 'err', '❌ Error al leer el KML');
+    console.error(err);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  KML → GeoJSON (parser nativo, sin dependencias extra)
+// ═══════════════════════════════════════════════════════════════
+function kmlToGeoJSON(xml) {
+  const features = [];
+  const placemarks = xml.getElementsByTagName('Placemark');
+
+  for (const pm of placemarks) {
+    const name = pm.getElementsByTagName('name')[0]?.textContent || '';
+    const geoms = [];
+
+    // Polygon
+    for (const poly of pm.getElementsByTagName('Polygon')) {
+      const outer = poly.getElementsByTagName('outerBoundaryIs')[0];
+      if (!outer) continue;
+      const coords = parseCoords(outer.getElementsByTagName('coordinates')[0]?.textContent);
+      const holes  = [];
+      for (const inner of poly.getElementsByTagName('innerBoundaryIs')) {
+        holes.push(parseCoords(inner.getElementsByTagName('coordinates')[0]?.textContent));
+      }
+      geoms.push({ type: 'Polygon', coordinates: [coords, ...holes] });
+    }
+
+    // MultiGeometry
+    if (geoms.length === 0) {
+      for (const mg of pm.getElementsByTagName('MultiGeometry')) {
+        for (const poly of mg.getElementsByTagName('Polygon')) {
+          const outer = poly.getElementsByTagName('outerBoundaryIs')[0];
+          if (!outer) continue;
+          const coords = parseCoords(outer.getElementsByTagName('coordinates')[0]?.textContent);
+          geoms.push({ type: 'Polygon', coordinates: [coords] });
+        }
+      }
+    }
+
+    if (geoms.length === 0) continue;
+
+    const geometry = geoms.length === 1 ? geoms[0] : { type: 'GeometryCollection', geometries: geoms };
+    features.push({ type: 'Feature', properties: { name }, geometry });
+  }
+
+  return { type: 'FeatureCollection', features };
+}
+
+function parseCoords(raw) {
+  if (!raw) return [];
+  return raw.trim().split(/\s+/).map(pair => {
+    const [lng, lat] = pair.split(',').map(Number);
+    return [lng, lat];
+  }).filter(c => !isNaN(c[0]) && !isNaN(c[1]));
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TOGGLE CAPAS
+// ═══════════════════════════════════════════════════════════════
+function toggleYear(year, btn) {
+  btn.classList.toggle('on');
+  const visible = btn.classList.contains('on');
+  state.visible[year] = visible;
+
+  if (state.layers[year]) {
+    if (visible) map.addLayer(state.layers[year]);
+    else          map.removeLayer(state.layers[year]);
+  }
+
+  const card = document.getElementById(`card-${year}`);
+  if (visible) card.classList.add('active');
+  else          card.classList.remove('active');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  OPACIDAD
+// ═══════════════════════════════════════════════════════════════
+function updateOpacity(val) {
+  state.opacity = val / 100;
+  document.getElementById('opacityVal').textContent = val + '%';
+  Object.values(state.layers).forEach(lyr => {
+    if (lyr) lyr.setStyle({
+      opacity:     state.opacity,
+      fillOpacity: state.opacity * 0.4
+    });
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MAPA BASE
+// ═══════════════════════════════════════════════════════════════
+function setBasemap(name) {
+  map.removeLayer(basemaps[state.basemap]);
+  basemaps[name].addTo(map);
+  // Asegurar que los layers de datos queden encima
+  Object.values(state.layers).forEach(l => { if (l) l.bringToFront(); });
+  state.basemap = name;
+  document.querySelectorAll('.basemap-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(`btn-${name}`).classList.add('active');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  ESTADÍSTICAS
+// ═══════════════════════════════════════════════════════════════
+function updateStats() {
+  const nLoaded = Object.values(state.loaded).filter(Boolean).length;
+  document.getElementById('stat-layers').textContent = `${nLoaded}/4`;
+
+  const total = Object.values(state.feats).reduce((a,b) => a + b, 0);
+  document.getElementById('stat-feats').textContent = total > 0 ? total.toLocaleString() : '—';
+
+  if (nLoaded > 0) {
+    document.getElementById('stat-area').textContent = '~1.052 km² · Caldas';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════════════
+function setStatus(year, type, msg) {
+  const el = document.getElementById(`status-${year}`);
+  el.className = `year-status ${type === 'ok' ? 'ok' : type === 'loading' ? 'waiting' : 'waiting'}`;
+  el.innerHTML = type === 'loading'
+    ? `<span class="loader"></span> <span>Procesando...</span>`
+    : `<span>${msg}</span>`;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>
