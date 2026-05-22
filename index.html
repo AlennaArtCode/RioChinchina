@@ -1,674 +1,829 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Río Chinchiná — Análisis Multitemporal del Cauce</title>
-  <meta name="description" content="Visualización interactiva del trazado histórico del Río Chinchiná, Caldas, Colombia (2006–2026) usando imágenes satelitales Landsat." />
-
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet" />
+  <meta name="description" content="Visualización interactiva del trazado histórico del Río Chinchiná, Caldas, Colombia (2006–2026)."/>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
   <style>
-    /* ── RESET & BASE ───────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#080d18;--surface:#0f1623;--surface2:#161e2e;--surface3:#1e2a3d;
+      --border:rgba(255,255,255,0.07);--text:#e2e8f0;--muted:#64748b;--muted2:#94a3b8;
+      --accent:#38bdf8;--accent2:#818cf8;
+      --c06:#f59e0b;--c12:#f97316;--c18:#22d3ee;--c26:#34d399;
+    }
+    html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
 
-    :root {
-      --bg:         #0a0e1a;
-      --surface:    #111827;
-      --surface2:   #1a2235;
-      --border:     rgba(255,255,255,0.07);
-      --text:       #e2e8f0;
-      --muted:      #94a3b8;
-      --accent:     #38bdf8;
+    /* ── LAYOUT ── */
+    #app{display:flex;height:100vh;overflow:hidden}
 
-      --c2006: #f59e0b;   /* ámbar */
-      --c2012: #f97316;   /* naranja */
-      --c2018: #22d3ee;   /* cian */
-      --c2026: #34d399;   /* esmeralda */
+    /* ── SIDEBAR ── */
+    #sidebar{
+      width:300px;min-width:300px;background:var(--surface);
+      border-right:1px solid var(--border);display:flex;
+      flex-direction:column;overflow-y:auto;z-index:20;
+      scrollbar-width:thin;scrollbar-color:var(--surface3) transparent;
     }
+    #sidebar::-webkit-scrollbar{width:4px}
+    #sidebar::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:2px}
 
-    html, body { height: 100%; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
+    .s-head{
+      padding:20px 18px 14px;
+      background:linear-gradient(160deg,#0a1020 0%,#0f1e35 100%);
+      border-bottom:1px solid var(--border);flex-shrink:0;
+    }
+    .badge{
+      display:inline-flex;align-items:center;gap:5px;
+      background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.25);
+      color:var(--accent);font-size:9px;font-weight:700;letter-spacing:1.4px;
+      text-transform:uppercase;padding:3px 8px;border-radius:4px;margin-bottom:10px;
+    }
+    .s-head h1{font-family:'Space Grotesk',sans-serif;font-size:17px;font-weight:700;line-height:1.3;color:#f1f5f9}
+    .s-head p{font-size:11px;color:var(--muted2);margin-top:5px;line-height:1.5}
 
-    /* ── LAYOUT ─────────────────────────────────────────────── */
-    #app { display: flex; height: 100vh; }
+    .sec{padding:14px 18px;border-bottom:1px solid var(--border)}
+    .sec-t{font-size:9px;font-weight:700;letter-spacing:1.3px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:6px}
 
-    /* ── SIDEBAR ────────────────────────────────────────────── */
-    #sidebar {
-      width: 320px; min-width: 320px;
-      background: var(--surface);
-      border-right: 1px solid var(--border);
-      display: flex; flex-direction: column;
-      overflow-y: auto;
-      z-index: 10;
+    /* ── UPLOAD ── */
+    .drop-zone{
+      border:2px dashed rgba(56,189,248,.25);border-radius:10px;
+      padding:16px;text-align:center;cursor:pointer;transition:all .2s;
+      background:rgba(56,189,248,.03);
     }
+    .drop-zone:hover,.drop-zone.over{border-color:var(--accent);background:rgba(56,189,248,.08)}
+    .drop-zone svg{opacity:.45;margin-bottom:6px}
+    .drop-zone p{font-size:11px;color:var(--muted2);line-height:1.5}
+    .drop-zone span{color:var(--accent);font-weight:500}
+    #fileInput{display:none}
 
-    .sidebar-header {
-      padding: 24px 20px 16px;
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-      border-bottom: 1px solid var(--border);
+    /* ── YEAR CARDS ── */
+    .y-cards{display:flex;flex-direction:column;gap:6px}
+    .y-card{
+      border-radius:9px;border:1px solid var(--border);
+      background:var(--surface2);overflow:hidden;transition:all .2s;
+      --yc:gray;
     }
-    .sidebar-header .badge {
-      display: inline-block;
-      background: rgba(56,189,248,0.15);
-      border: 1px solid rgba(56,189,248,0.3);
-      color: var(--accent);
-      font-size: 10px; font-weight: 600; letter-spacing: 1.5px;
-      text-transform: uppercase; padding: 3px 8px; border-radius: 4px;
-      margin-bottom: 10px;
+    .y-card.active{border-color:var(--yc);box-shadow:0 0 0 1px var(--yc) inset}
+    .y-card-h{display:flex;align-items:center;gap:8px;padding:9px 11px;cursor:pointer}
+    .y-dot{width:9px;height:9px;border-radius:50%;background:var(--yc);flex-shrink:0;box-shadow:0 0 7px var(--yc)}
+    .y-lbl{font-size:13px;font-weight:600;flex:1}
+    .y-sat{font-size:9px;color:var(--muted)}
+    .y-tog{
+      width:34px;height:19px;border-radius:9px;
+      background:rgba(255,255,255,.1);position:relative;
+      cursor:pointer;transition:background .2s;border:none;flex-shrink:0;
     }
-    .sidebar-header h1 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 18px; font-weight: 700; line-height: 1.3;
-      color: #f1f5f9;
-    }
-    .sidebar-header p {
-      font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.5;
-    }
+    .y-tog::after{content:'';position:absolute;width:13px;height:13px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform .2s}
+    .y-tog.on{background:var(--yc)}
+    .y-tog.on::after{transform:translateX(15px)}
+    .y-stat{font-size:10px;color:var(--muted2);padding:0 11px 8px;display:flex;align-items:center;gap:5px}
+    .y-stat.ok{color:#34d399}
 
-    /* ── UPLOAD ZONE ────────────────────────────────────────── */
-    .section { padding: 16px 20px; border-bottom: 1px solid var(--border); }
-    .section-title {
-      font-size: 10px; font-weight: 600; letter-spacing: 1.2px;
-      text-transform: uppercase; color: var(--muted); margin-bottom: 12px;
+    /* ── BASEMAP ── */
+    .bm-btns{display:flex;gap:5px}
+    .bm-btn{
+      flex:1;padding:6px 2px;font-size:10px;font-weight:500;
+      border-radius:6px;border:1px solid var(--border);
+      background:var(--surface2);color:var(--muted2);cursor:pointer;transition:all .15s;
     }
+    .bm-btn.active{background:rgba(56,189,248,.12);border-color:var(--accent);color:var(--accent)}
 
-    .upload-zone {
-      border: 2px dashed rgba(56,189,248,0.3);
-      border-radius: 10px;
-      padding: 20px 16px;
-      text-align: center;
-      cursor: pointer;
-      transition: all .2s;
-      background: rgba(56,189,248,0.03);
-    }
-    .upload-zone:hover, .upload-zone.drag-over {
-      border-color: var(--accent);
-      background: rgba(56,189,248,0.08);
-    }
-    .upload-zone svg { opacity: .5; margin-bottom: 8px; }
-    .upload-zone p { font-size: 12px; color: var(--muted); line-height: 1.5; }
-    .upload-zone span { color: var(--accent); font-weight: 500; }
-    #fileInput { display: none; }
+    /* ── OPACITY ── */
+    .op-row{display:flex;align-items:center;gap:8px}
+    .op-row label{font-size:10px;color:var(--muted2);white-space:nowrap}
+    input[type=range]{flex:1;-webkit-appearance:none;height:3px;background:var(--border);border-radius:2px;outline:none}
+    input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--accent);cursor:pointer}
 
-    /* ── YEAR CARDS ─────────────────────────────────────────── */
-    .year-cards { display: flex; flex-direction: column; gap: 8px; }
+    /* ── POI LIST ── */
+    .poi-list{display:flex;flex-direction:column;gap:5px}
+    .poi-item{
+      display:flex;align-items:center;gap:8px;padding:7px 10px;
+      border-radius:7px;background:var(--surface3);
+      border:1px solid var(--border);cursor:pointer;transition:all .15s;font-size:11px;
+    }
+    .poi-item:hover{border-color:rgba(255,255,255,.15);background:var(--surface2)}
+    .poi-icon{font-size:14px;flex-shrink:0}
+    .poi-name{font-weight:500;color:var(--text)}
+    .poi-alt{font-size:9px;color:var(--muted2);margin-top:1px}
 
-    .year-card {
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: var(--surface2);
-      overflow: hidden;
-      transition: all .2s;
-    }
-    .year-card.loaded { border-color: rgba(255,255,255,0.12); }
-    .year-card.active { box-shadow: 0 0 0 1.5px var(--year-color); border-color: var(--year-color); }
+    /* ── FOOTER ── */
+    .s-foot{margin-top:auto;padding:12px 18px;border-top:1px solid var(--border);font-size:9px;color:var(--muted);text-align:center}
 
-    .year-card-header {
-      display: flex; align-items: center; gap: 10px;
-      padding: 10px 12px; cursor: pointer;
-    }
-    .year-dot {
-      width: 10px; height: 10px; border-radius: 50%;
-      background: var(--year-color); flex-shrink: 0;
-      box-shadow: 0 0 8px var(--year-color);
-    }
-    .year-label { font-size: 14px; font-weight: 600; flex: 1; }
-    .year-sat { font-size: 10px; color: var(--muted); }
-    .year-toggle {
-      width: 36px; height: 20px; border-radius: 10px;
-      background: rgba(255,255,255,0.1); position: relative;
-      cursor: pointer; transition: background .2s; flex-shrink: 0;
-      border: none;
-    }
-    .year-toggle::after {
-      content: ''; position: absolute;
-      width: 14px; height: 14px; border-radius: 50%;
-      background: #fff; top: 3px; left: 3px;
-      transition: transform .2s;
-    }
-    .year-toggle.on { background: var(--year-color); }
-    .year-toggle.on::after { transform: translateX(16px); }
+    /* ── MAP AREA ── */
+    #mapArea{flex:1;display:flex;flex-direction:column;min-width:0;position:relative}
+    #map{flex:1;min-height:0;width:100%}
 
-    .year-status {
-      font-size: 10px; color: var(--muted);
-      padding: 0 12px 8px; display: flex; align-items: center; gap: 4px;
+    /* ── ANIMATION BAR ── */
+    #animBar{
+      background:rgba(8,13,24,.92);backdrop-filter:blur(14px);
+      border-top:1px solid var(--border);
+      padding:10px 20px 12px;display:flex;align-items:center;gap:14px;
+      flex-shrink:0;
     }
-    .year-status.ok { color: #34d399; }
-    .year-status.waiting { color: var(--muted); }
-
-    /* ── STATS ──────────────────────────────────────────────── */
-    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .stat-box {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 8px; padding: 10px 12px;
+    .anim-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--muted2);white-space:nowrap}
+    .anim-year-display{
+      font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;
+      color:var(--accent);min-width:52px;text-align:center;
     }
-    .stat-val { font-size: 18px; font-weight: 700; color: var(--accent); }
-    .stat-lbl { font-size: 10px; color: var(--muted); margin-top: 2px; }
-
-    /* ── BASEMAP ────────────────────────────────────────────── */
-    .basemap-btns { display: flex; gap: 6px; }
-    .basemap-btn {
-      flex: 1; padding: 7px 4px; font-size: 11px; font-weight: 500;
-      border-radius: 6px; border: 1px solid var(--border);
-      background: var(--surface2); color: var(--muted);
-      cursor: pointer; transition: all .15s; text-align: center;
+    #animSlider{
+      flex:1;-webkit-appearance:none;height:4px;
+      border-radius:2px;outline:none;cursor:pointer;
+      background:linear-gradient(to right, var(--accent) 0%, var(--accent) var(--pct,0%), rgba(255,255,255,.1) var(--pct,0%), rgba(255,255,255,.1) 100%);
     }
-    .basemap-btn.active {
-      background: rgba(56,189,248,0.15);
-      border-color: var(--accent); color: var(--accent);
+    #animSlider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 0 10px var(--accent)}
+    .anim-btn{
+      width:34px;height:34px;border-radius:50%;
+      background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.25);
+      color:var(--accent);cursor:pointer;display:flex;align-items:center;justify-content:center;
+      transition:all .15s;font-size:14px;flex-shrink:0;
     }
+    .anim-btn:hover{background:rgba(56,189,248,.2);border-color:var(--accent)}
+    .anim-btn.playing{background:rgba(249,115,22,.12);border-color:rgba(249,115,22,.3);color:#f97316}
 
-    /* ── OPACITY SLIDER ─────────────────────────────────────── */
-    .opacity-row { display: flex; align-items: center; gap: 10px; }
-    .opacity-row label { font-size: 11px; color: var(--muted); white-space: nowrap; }
-    input[type=range] {
-      flex: 1; -webkit-appearance: none; height: 4px;
-      background: var(--border); border-radius: 2px; outline: none;
+    .anim-dots{display:flex;gap:6px;align-items:center}
+    .anim-dot{
+      width:8px;height:8px;border-radius:50%;
+      background:rgba(255,255,255,.15);cursor:pointer;transition:all .2s;
+      border:1.5px solid transparent;
     }
-    input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none; width: 14px; height: 14px;
-      border-radius: 50%; background: var(--accent); cursor: pointer;
+    .anim-dot.active{background:var(--dot-color);border-color:var(--dot-color);box-shadow:0 0 6px var(--dot-color)}
+
+    /* ── CHARTS PANEL ── */
+    #chartsPanel{
+      background:var(--surface);border-top:1px solid var(--border);
+      height:0;overflow:hidden;transition:height .35s cubic-bezier(.4,0,.2,1);
+      flex-shrink:0;
     }
-
-    /* ── INFO BOX ───────────────────────────────────────────── */
-    .info-box {
-      background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 8px; padding: 12px; font-size: 11px;
-      color: var(--muted); line-height: 1.6;
+    #chartsPanel.open{height:220px}
+    .charts-inner{display:flex;gap:1px;height:100%;background:var(--border)}
+    .chart-box{
+      flex:1;background:var(--surface);padding:14px 18px;
+      display:flex;flex-direction:column;
     }
-    .info-box strong { color: var(--text); }
+    .chart-title{font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted2);margin-bottom:10px}
 
-    /* ── FOOTER ─────────────────────────────────────────────── */
-    .sidebar-footer {
-      margin-top: auto; padding: 14px 20px;
-      border-top: 1px solid var(--border);
-      font-size: 10px; color: var(--muted); text-align: center;
+    /* ── MAP FLOATING ── */
+    .map-pill{
+      position:absolute;z-index:500;
+      background:rgba(8,13,24,.88);backdrop-filter:blur(12px);
+      border:1px solid var(--border);border-radius:9px;padding:7px 13px;
+      font-size:12px;color:var(--text);
     }
+    #mapTitle{top:14px;left:14px;font-weight:600;font-size:12px;display:flex;align-items:center;gap:7px}
+    #mapCoords{bottom:10px;right:14px;font-size:10px;color:var(--muted2)}
 
-    /* ── MAP ────────────────────────────────────────────────── */
-    #map { width: 100%; height: 100%; z-index: 1; }
-
-    /* ── MAP OVERLAY CONTROLS ───────────────────────────────── */
-    .map-pill {
-      position: absolute; z-index: 500;
-      background: rgba(10,14,26,0.85);
-      backdrop-filter: blur(12px);
-      border: 1px solid var(--border);
-      border-radius: 10px; padding: 8px 14px;
-      font-size: 12px; color: var(--text);
+    #chartToggleBtn{
+      top:14px;right:14px;cursor:pointer;display:flex;align-items:center;gap:6px;
+      font-size:11px;font-weight:500;color:var(--muted2);transition:all .2s;
     }
-    #map-title { top: 16px; left: 16px; font-weight: 600; font-size: 13px; }
-    #map-coords { bottom: 30px; right: 16px; font-size: 11px; color: var(--muted); }
+    #chartToggleBtn:hover{color:var(--accent);border-color:rgba(56,189,248,.3)}
+    #chartToggleBtn.active{color:var(--accent);border-color:rgba(56,189,248,.4)}
 
-    /* ── LEGEND ─────────────────────────────────────────────── */
-    #legend {
-      position: absolute; bottom: 30px; left: 16px; z-index: 500;
-      background: rgba(10,14,26,0.88);
-      backdrop-filter: blur(12px);
-      border: 1px solid var(--border);
-      border-radius: 10px; padding: 12px 16px;
+    /* ── LEGEND ── */
+    #legend{
+      position:absolute;bottom:10px;left:14px;z-index:500;
+      background:rgba(8,13,24,.88);backdrop-filter:blur(12px);
+      border:1px solid var(--border);border-radius:9px;padding:11px 14px;
     }
-    #legend .leg-title { font-size: 10px; font-weight: 600; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
-    .leg-item { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 12px; }
-    .leg-line { width: 24px; height: 3px; border-radius: 2px; }
+    .leg-t{font-size:9px;font-weight:700;letter-spacing:1px;color:var(--muted2);text-transform:uppercase;margin-bottom:7px}
+    .leg-i{display:flex;align-items:center;gap:7px;margin-bottom:4px;font-size:11px}
+    .leg-l{width:22px;height:3px;border-radius:2px}
 
-    /* ── TOAST ──────────────────────────────────────────────── */
-    #toast {
-      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-      background: #1e293b; border: 1px solid var(--accent);
-      color: var(--text); padding: 10px 20px; border-radius: 8px;
-      font-size: 13px; z-index: 9999; opacity: 0;
-      transition: opacity .3s; pointer-events: none;
+    /* ── TOAST ── */
+    #toast{
+      position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+      background:var(--surface2);border:1px solid rgba(56,189,248,.3);
+      color:var(--text);padding:9px 18px;border-radius:8px;
+      font-size:12px;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;
     }
-    #toast.show { opacity: 1; }
+    #toast.show{opacity:1}
 
-    /* ── LOADER ─────────────────────────────────────────────── */
-    .loader {
-      display: inline-block; width: 10px; height: 10px;
-      border: 2px solid rgba(255,255,255,0.1);
-      border-top-color: var(--accent); border-radius: 50%;
-      animation: spin .7s linear infinite;
+    /* ── LOADER ── */
+    .spin{display:inline-block;width:9px;height:9px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* Leaflet dark */
+    .leaflet-control-zoom a{background:#161e2e !important;color:#64748b !important;border-color:#1e2a3d !important}
+    .leaflet-control-zoom a:hover{background:#1e2a3d !important;color:#e2e8f0 !important}
+    .leaflet-control-attribution{background:rgba(8,13,24,.7) !important;color:#334155 !important}
+    .leaflet-control-attribution a{color:#475569 !important}
+
+    /* Custom POI markers */
+    .poi-marker{
+      display:flex;align-items:center;justify-content:center;
+      width:32px;height:32px;border-radius:50%;
+      background:rgba(8,13,24,.9);border:2px solid var(--mc);
+      font-size:14px;box-shadow:0 0 12px var(--mc);
+      transition:transform .2s;cursor:pointer;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .poi-marker:hover{transform:scale(1.2)}
 
-    /* Leaflet dark override */
-    .leaflet-control-zoom a { background: #1a2235 !important; color: #94a3b8 !important; border-color: #2d3748 !important; }
-    .leaflet-control-zoom a:hover { background: #253044 !important; color: #e2e8f0 !important; }
-    .leaflet-control-attribution { background: rgba(10,14,26,0.7) !important; color: #475569 !important; }
-    .leaflet-control-attribution a { color: #64748b !important; }
-
-    /* Responsive */
-    @media (max-width: 680px) {
-      #sidebar { width: 100%; min-width: unset; height: 55vh; border-right: none; border-bottom: 1px solid var(--border); overflow-y: auto; }
-      #app { flex-direction: column; }
-      #map { flex: 1; }
+    @media(max-width:700px){
+      #sidebar{width:100%;min-width:unset;height:50vh;border-right:none;border-bottom:1px solid var(--border)}
+      #app{flex-direction:column}
+      #chartsPanel.open{height:180px}
     }
   </style>
 </head>
 <body>
-
 <div id="app">
 
-  <!-- ═══════════════════════════════════════════════════════ SIDEBAR -->
+  <!-- ════════════════════════════════ SIDEBAR -->
   <aside id="sidebar">
-
-    <div class="sidebar-header">
-      <div class="badge">🛰 Análisis GEE · Landsat</div>
+    <div class="s-head">
+      <div class="badge">🛰 GEE · Landsat · MNDWI</div>
       <h1>Río Chinchiná<br/>Evolución del Cauce</h1>
-      <p>Cuenca hidrográfica de Caldas, Colombia · Parque Los Nevados → Río Cauca</p>
+      <p>Cuenca hidrográfica · Caldas, Colombia<br/>Parque Los Nevados → Río Cauca</p>
     </div>
 
-    <!-- CARGAR KML -->
-    <div class="section">
-      <div class="section-title">📂 Cargar archivos KML</div>
-      <div class="upload-zone" id="uploadZone">
-        <input type="file" id="fileInput" accept=".kml" multiple />
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.5">
-          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
-        </svg>
-        <p><span>Haz clic</span> o arrastra aquí<br/>los 4 archivos KML descargados<br/><small style="font-size:10px">(cauce_rio_chinchina_2006.kml, etc.)</small></p>
+    <!-- UPLOAD -->
+    <div class="sec">
+      <div class="sec-t">📂 Cargar KML</div>
+      <div class="drop-zone" id="dropZone">
+        <input type="file" id="fileInput" accept=".kml" multiple/>
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+        <p><span>Clic</span> o arrastra los 4 KML<br/><small style="font-size:9px;color:#475569">cauce_rio_chinchina_2006.kml…</small></p>
       </div>
     </div>
 
-    <!-- CAPAS POR AÑO -->
-    <div class="section">
-      <div class="section-title">🗂 Capas por año</div>
-      <div class="year-cards" id="yearCards">
-        <!-- generado por JS -->
-      </div>
+    <!-- YEAR CARDS -->
+    <div class="sec">
+      <div class="sec-t">🗂 Capas por año</div>
+      <div class="y-cards" id="yCards"></div>
     </div>
 
-    <!-- OPCIONES DE MAPA -->
-    <div class="section">
-      <div class="section-title">🗺 Mapa base</div>
-      <div class="basemap-btns">
-        <button class="basemap-btn" id="btn-satellite" onclick="setBasemap('satellite')">🛰 Satélite</button>
-        <button class="basemap-btn active" id="btn-dark" onclick="setBasemap('dark')">🌑 Oscuro</button>
-        <button class="basemap-btn" id="btn-topo" onclick="setBasemap('topo')">🏔 Topo</button>
+    <!-- PUNTOS DE INTERÉS -->
+    <div class="sec">
+      <div class="sec-t">📍 Puntos de interés</div>
+      <div class="poi-list" id="poiList"></div>
+    </div>
+
+    <!-- MAPA BASE -->
+    <div class="sec">
+      <div class="sec-t">🗺 Mapa base</div>
+      <div class="bm-btns">
+        <button class="bm-btn" id="bm-satellite" onclick="setBasemap('satellite')">🛰 Satélite</button>
+        <button class="bm-btn active" id="bm-dark" onclick="setBasemap('dark')">🌑 Oscuro</button>
+        <button class="bm-btn" id="bm-topo" onclick="setBasemap('topo')">🏔 Topo</button>
       </div>
     </div>
 
     <!-- OPACIDAD -->
-    <div class="section">
-      <div class="section-title">🔆 Opacidad de capas</div>
-      <div class="opacity-row">
+    <div class="sec">
+      <div class="sec-t">🔆 Opacidad</div>
+      <div class="op-row">
         <label>Trazados</label>
-        <input type="range" id="opacitySlider" min="10" max="100" value="85" oninput="updateOpacity(this.value)" />
-        <label id="opacityVal">85%</label>
+        <input type="range" id="opSlider" min="10" max="100" value="80" oninput="setOpacity(this.value)"/>
+        <label id="opVal">80%</label>
       </div>
     </div>
 
-    <!-- ESTADÍSTICAS -->
-    <div class="section">
-      <div class="section-title">📊 Estadísticas</div>
-      <div class="stats-grid">
-        <div class="stat-box">
-          <div class="stat-val" id="stat-layers">0/4</div>
-          <div class="stat-lbl">Capas cargadas</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-val" id="stat-feats">—</div>
-          <div class="stat-lbl">Polígonos totales</div>
-        </div>
-        <div class="stat-box" style="grid-column:1/-1">
-          <div class="stat-val" style="font-size:13px" id="stat-area">Carga los KML para ver stats</div>
-          <div class="stat-lbl">Área de análisis</div>
-        </div>
+    <!-- METODOLOGÍA -->
+    <div class="sec">
+      <div class="sec-t">ℹ Metodología</div>
+      <div style="font-size:10px;color:var(--muted2);line-height:1.7;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:10px 11px">
+        <b style="color:var(--text)">MNDWI</b> = (Verde − SWIR) / (Verde + SWIR)<br/>
+        Umbral: <b style="color:var(--accent)">MNDWI &gt; 0.05</b> → píxeles de agua<br/>
+        Resolución espacial: <b style="color:var(--text)">30 m</b> (Landsat)<br/>
+        Procesamiento: <b style="color:var(--text)">Google Earth Engine</b>
       </div>
     </div>
 
-    <!-- INFO -->
-    <div class="section">
-      <div class="section-title">ℹ️ Metodología</div>
-      <div class="info-box">
-        <strong>Índice MNDWI</strong> · Detección de agua superficial<br/>
-        <strong>Landsat 5/7/8/9</strong> · Resolución 30 m<br/>
-        <strong>GEE · Google Earth Engine</strong> · Procesamiento en nube<br/>
-        <strong>Cuenca:</strong> ~1.052 km² | Alt. 860–5.200 m s.n.m.
-      </div>
-    </div>
-
-    <div class="sidebar-footer">
-      Alenna Art Code · 2026 · Google Earth Engine API
-    </div>
-
+    <div class="s-foot">Alenna Art Code · 2026 · Google Earth Engine API</div>
   </aside>
 
-  <!-- ═══════════════════════════════════════════════════════ MAPA -->
-  <div style="position:relative; flex:1; height:100%; min-height:0;">
-    <div id="map"></div>
+  <!-- ════════════════════════════════ MAP AREA -->
+  <div id="mapArea">
 
-    <!-- Título flotante -->
-    <div class="map-pill" id="map-title">
-      🌊 Río Chinchiná · Caldas, Colombia
+    <!-- MAP -->
+    <div style="flex:1;position:relative;min-height:0;display:flex;flex-direction:column">
+      <div id="map" style="flex:1;min-height:0"></div>
+
+      <!-- Floating pills -->
+      <div class="map-pill" id="mapTitle">🌊 Río Chinchiná · Caldas, Colombia</div>
+
+      <div class="map-pill" id="chartToggleBtn" onclick="toggleCharts()">
+        📊 <span id="chartBtnLbl">Ver gráficas</span>
+      </div>
+
+      <div class="map-pill" id="mapCoords">— coords —</div>
+
+      <!-- Legend -->
+      <div id="legend">
+        <div class="leg-t">Cauce por año</div>
+        <div class="leg-i"><div class="leg-l" style="background:var(--c06)"></div>2006 · Landsat 5</div>
+        <div class="leg-i"><div class="leg-l" style="background:var(--c12)"></div>2012 · Landsat 7</div>
+        <div class="leg-i"><div class="leg-l" style="background:var(--c18)"></div>2018 · Landsat 8</div>
+        <div class="leg-i"><div class="leg-l" style="background:var(--c26)"></div>2026 · Landsat 9</div>
+      </div>
     </div>
 
-    <!-- Coordenadas -->
-    <div class="map-pill" id="map-coords">—</div>
+    <!-- ANIMATION BAR -->
+    <div id="animBar">
+      <div class="anim-label">Año</div>
+      <div class="anim-year-display" id="animYearDisplay">Todos</div>
 
-    <!-- Leyenda -->
-    <div id="legend">
-      <div class="leg-title">Cauce por año</div>
-      <div class="leg-item"><div class="leg-line" style="background:var(--c2006)"></div>2006 · Landsat 5</div>
-      <div class="leg-item"><div class="leg-line" style="background:var(--c2012)"></div>2012 · Landsat 7</div>
-      <div class="leg-item"><div class="leg-line" style="background:var(--c2018)"></div>2018 · Landsat 8</div>
-      <div class="leg-item"><div class="leg-line" style="background:var(--c2026)"></div>2026 · Landsat 9</div>
+      <!-- Prev -->
+      <button class="anim-btn" onclick="animStep(-1)" title="Anterior">◀</button>
+
+      <!-- Play/Pause -->
+      <button class="anim-btn" id="playBtn" onclick="togglePlay()" title="Reproducir">▶</button>
+
+      <!-- Slider -->
+      <input type="range" id="animSlider" min="0" max="4" step="1" value="0"
+             oninput="onSliderChange(this.value)" style="--pct:0%"/>
+
+      <!-- Next -->
+      <button class="anim-btn" onclick="animStep(1)" title="Siguiente">▶▶</button>
+
+      <!-- Dots -->
+      <div class="anim-dots" id="animDots"></div>
+
+      <!-- Reset -->
+      <button class="anim-btn" onclick="showAll()" title="Mostrar todos" style="font-size:11px">ALL</button>
     </div>
+
+    <!-- CHARTS PANEL -->
+    <div id="chartsPanel">
+      <div class="charts-inner">
+        <div class="chart-box">
+          <div class="chart-title">📊 Área detectada del cauce por año (km²)</div>
+          <canvas id="barChart"></canvas>
+        </div>
+        <div class="chart-box" style="border-left:1px solid var(--border)">
+          <div class="chart-title">📈 Tendencia de cambio (polígonos detectados)</div>
+          <canvas id="lineChart"></canvas>
+        </div>
+        <div class="chart-box" style="border-left:1px solid var(--border);flex:0 0 180px">
+          <div class="chart-title">📋 Resumen</div>
+          <div id="summaryTable" style="font-size:10px;color:var(--muted2);line-height:1.8"></div>
+        </div>
+      </div>
+    </div>
+
   </div>
-
 </div>
 
-<!-- Toast -->
 <div id="toast"></div>
 
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <script>
-// ═══════════════════════════════════════════════════════════════
-//  CONFIGURACIÓN
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════════════════
 const YEARS = [
-  { year: 2006, sat: 'Landsat 5 TM',   color: '#f59e0b' },
-  { year: 2012, sat: 'Landsat 7 ETM+', color: '#f97316' },
-  { year: 2018, sat: 'Landsat 8 OLI',  color: '#22d3ee' },
-  { year: 2026, sat: 'Landsat 9 OLI-2',color: '#34d399' },
+  {year:2006, sat:'Landsat 5 TM',    color:'#f59e0b'},
+  {year:2012, sat:'Landsat 7 ETM+',  color:'#f97316'},
+  {year:2018, sat:'Landsat 8 OLI',   color:'#22d3ee'},
+  {year:2026, sat:'Landsat 9 OLI-2', color:'#34d399'},
 ];
 
-// Centro de la cuenca Río Chinchiná
-const CENTER = [5.0, -75.62];
-const ZOOM   = 11;
+const POIS = [
+  {name:'Manizales',       alt:'Capital de Caldas · 2.153 m',  lat:5.0703,  lng:-75.5138, icon:'🏙', color:'#f8fafc'},
+  {name:'Villamaría',      alt:'Municipio · 1.700 m',           lat:5.0283,  lng:-75.5053, icon:'🏘', color:'#cbd5e1'},
+  {name:'Chinchiná',       alt:'Municipio cafetero · 1.370 m', lat:4.9811,  lng:-75.6072, icon:'☕', color:'#92400e'},
+  {name:'Palestina',       alt:'Municipio · 1.075 m',           lat:5.0408,  lng:-75.7003, icon:'🌿', color:'#4ade80'},
+  {name:'Nevado del Ruiz', alt:'Volcán · 5.321 m s.n.m.',      lat:4.8924,  lng:-75.3247, icon:'🌋', color:'#7dd3fc'},
+  {name:'Desembocadura',   alt:'→ Río Cauca · 860 m',           lat:4.8700,  lng:-75.8900, icon:'💧', color:'#38bdf8'},
+];
 
-// ═══════════════════════════════════════════════════════════════
-//  ESTADO
-// ═══════════════════════════════════════════════════════════════
-const state = {
-  layers:   {},   // { 2006: L.geoJSON, ... }
-  visible:  { 2006: true, 2012: true, 2018: true, 2026: true },
-  opacity:  0.85,
-  loaded:   {},   // { 2006: true/false, ... }
-  feats:    {},   // { 2006: N, ... }
-  basemap:  'dark',
+// ═══════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════
+const S = {
+  layers:{}, loaded:{}, feats:{}, areas:{},
+  visible:{2006:true,2012:true,2018:true,2026:true},
+  opacity:0.80, basemap:'dark',
+  animIdx:0,    // 0=all, 1..4=year index
+  playing:false, playTimer:null,
+  chartsOpen:false, chartsBuilt:false,
+  barChart:null, lineChart:null,
 };
 
-// ═══════════════════════════════════════════════════════════════
-//  MAPA
-// ═══════════════════════════════════════════════════════════════
-const map = L.map('map', {
-  center: CENTER, zoom: ZOOM,
-  zoomControl: true,
-  attributionControl: true,
-});
+// ═══════════════════════════════════════════════════════════
+//  MAP
+// ═══════════════════════════════════════════════════════════
+const map = L.map('map',{center:[5.0,-75.62],zoom:11,zoomControl:true});
 
-const basemaps = {
-  dark: L.tileLayer(
-    'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-    { attribution: '© CartoDB', maxZoom: 19 }
-  ),
-  satellite: L.tileLayer(
-    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    { attribution: '© Esri', maxZoom: 19 }
-  ),
-  topo: L.tileLayer(
-    'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
-    { attribution: '© OpenTopoMap', maxZoom: 17 }
-  ),
+const TILES = {
+  dark:      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',      {attribution:'© CartoDB',maxZoom:19}),
+  satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:19}),
+  topo:      L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',                   {attribution:'© OpenTopoMap',maxZoom:17}),
 };
-basemaps.dark.addTo(map);
+TILES.dark.addTo(map);
 
-// Coordenadas en mapa
-map.on('mousemove', e => {
-  document.getElementById('map-coords').textContent =
-    `${e.latlng.lat.toFixed(5)}° N  ${e.latlng.lng.toFixed(5)}° W`;
+map.on('mousemove', e=>{
+  document.getElementById('mapCoords').textContent =
+    `${e.latlng.lat.toFixed(5)}°N  ${e.latlng.lng.toFixed(5)}°W`;
 });
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+//  POI MARKERS
+// ═══════════════════════════════════════════════════════════
+const poiList = document.getElementById('poiList');
+const poiMarkersMap = {};
+
+POIS.forEach(p=>{
+  // Mapa marker
+  const icon = L.divIcon({
+    className:'',
+    html:`<div class="poi-marker" style="--mc:${p.color}">${p.icon}</div>`,
+    iconSize:[32,32], iconAnchor:[16,16],
+  });
+  const marker = L.marker([p.lat,p.lng],{icon})
+    .addTo(map)
+    .bindPopup(`
+      <div style="font-family:Inter,sans-serif;min-width:150px;padding:2px 0">
+        <div style="font-size:15px;margin-bottom:2px">${p.icon} <b>${p.name}</b></div>
+        <div style="font-size:11px;color:#666">${p.alt}</div>
+        <div style="font-size:10px;color:#94a3b8;margin-top:4px">${p.lat.toFixed(4)}°N, ${p.lng.toFixed(4)}°W</div>
+      </div>`);
+  poiMarkersMap[p.name] = marker;
+
+  // Sidebar item
+  const item = document.createElement('div');
+  item.className='poi-item';
+  item.innerHTML=`
+    <span class="poi-icon">${p.icon}</span>
+    <div><div class="poi-name">${p.name}</div><div class="poi-alt">${p.alt}</div></div>`;
+  item.onclick = ()=>{ map.setView([p.lat,p.lng],14); marker.openPopup(); };
+  poiList.appendChild(item);
+});
+
+// ═══════════════════════════════════════════════════════════
 //  YEAR CARDS
-// ═══════════════════════════════════════════════════════════════
-const container = document.getElementById('yearCards');
-
-YEARS.forEach(({ year, sat, color }) => {
-  const card = document.createElement('div');
-  card.className = 'year-card';
-  card.id = `card-${year}`;
-  card.style.setProperty('--year-color', color);
-  card.innerHTML = `
-    <div class="year-card-header">
-      <div class="year-dot"></div>
-      <div>
-        <div class="year-label">${year}</div>
-        <div class="year-sat">${sat}</div>
-      </div>
-      <button class="year-toggle on" id="toggle-${year}" onclick="toggleYear(${year}, this)" title="Mostrar/ocultar"></button>
+// ═══════════════════════════════════════════════════════════
+const yCardsEl = document.getElementById('yCards');
+YEARS.forEach(({year,sat,color})=>{
+  const c = document.createElement('div');
+  c.className='y-card'; c.id=`card-${year}`;
+  c.style.setProperty('--yc',color);
+  c.innerHTML=`
+    <div class="y-card-h">
+      <div class="y-dot"></div>
+      <div><div class="y-lbl">${year}</div><div class="y-sat">${sat}</div></div>
+      <button class="y-tog on" id="tog-${year}" onclick="togYear(${year},this)"></button>
     </div>
-    <div class="year-status waiting" id="status-${year}">
-      <span>Esperando archivo KML...</span>
-    </div>`;
-  container.appendChild(card);
+    <div class="y-stat" id="st-${year}">Esperando KML…</div>`;
+  yCardsEl.appendChild(c);
 });
 
-// ═══════════════════════════════════════════════════════════════
-//  DRAG & DROP / FILE INPUT
-// ═══════════════════════════════════════════════════════════════
-const uploadZone = document.getElementById('uploadZone');
-const fileInput  = document.getElementById('fileInput');
-
-uploadZone.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', e => handleFiles(e.target.files));
-
-uploadZone.addEventListener('dragover', e => {
-  e.preventDefault(); uploadZone.classList.add('drag-over');
-});
-uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
-uploadZone.addEventListener('drop', e => {
-  e.preventDefault(); uploadZone.classList.remove('drag-over');
-  handleFiles(e.dataTransfer.files);
+// ═══════════════════════════════════════════════════════════
+//  ANIMATION DOTS
+// ═══════════════════════════════════════════════════════════
+const dotsEl = document.getElementById('animDots');
+[{label:'Todos',color:'#64748b'},...YEARS.map(y=>({label:y.year,color:y.color}))].forEach((d,i)=>{
+  const dot = document.createElement('div');
+  dot.className='anim-dot';dot.id=`dot-${i}`;
+  dot.style.setProperty('--dot-color',d.color);
+  dot.title = d.label;
+  dot.onclick=()=>goToAnimIdx(i);
+  dotsEl.appendChild(dot);
 });
 
-function handleFiles(files) {
-  [...files].forEach(file => {
-    const match = file.name.match(/(\d{4})/);
-    if (!match) return;
-    const year = parseInt(match[1]);
-    if (!YEARS.find(y => y.year === year)) return;
+// ═══════════════════════════════════════════════════════════
+//  UPLOAD
+// ═══════════════════════════════════════════════════════════
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+dropZone.onclick = ()=>fileInput.click();
+fileInput.onchange = e=>handleFiles(e.target.files);
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('over')});
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('over'));
+dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('over');handleFiles(e.dataTransfer.files)});
 
-    const reader = new FileReader();
-    reader.onload = e => loadKML(year, e.target.result);
-    reader.readAsText(file);
-    setStatus(year, 'loading', '');
+function handleFiles(files){
+  [...files].forEach(f=>{
+    const m=f.name.match(/(\d{4})/); if(!m)return;
+    const yr=+m[1]; if(!YEARS.find(y=>y.year===yr))return;
+    setStat(yr,'loading','');
+    const r=new FileReader();
+    r.onload=e=>parseAndLoad(yr,e.target.result);
+    r.readAsText(f);
   });
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  CARGAR KML → GeoJSON
-// ═══════════════════════════════════════════════════════════════
-function loadKML(year, kmlText) {
-  try {
-    const parser  = new DOMParser();
-    const xmlDoc  = parser.parseFromString(kmlText, 'text/xml');
-    const geojson = kmlToGeoJSON(xmlDoc);
+// ═══════════════════════════════════════════════════════════
+//  KML → GEOJSON
+// ═══════════════════════════════════════════════════════════
+function parseAndLoad(year, kmlText){
+  try{
+    const xml = new DOMParser().parseFromString(kmlText,'text/xml');
+    const gj  = kmlToGeoJSON(xml);
+    if(S.layers[year]) map.removeLayer(S.layers[year]);
 
-    if (state.layers[year]) {
-      map.removeLayer(state.layers[year]);
-    }
-
-    const cfg = YEARS.find(y => y.year === year);
-
-    const layer = L.geoJSON(geojson, {
-      style: {
-        color:       cfg.color,
-        fillColor:   cfg.color,
-        fillOpacity: state.opacity * 0.4,
-        weight:      2,
-        opacity:     state.opacity,
-      },
-      onEachFeature: (feature, lyr) => {
-        lyr.bindPopup(`
-          <div style="font-family:Inter,sans-serif;min-width:160px">
-            <div style="font-weight:700;font-size:14px;margin-bottom:4px">
-              <span style="color:${cfg.color}">●</span> Cauce ${year}
-            </div>
-            <div style="font-size:11px;color:#666">${cfg.sat}</div>
-            <div style="font-size:11px;color:#666;margin-top:4px">
-              Índice: MNDWI > 0.05
-            </div>
-          </div>`);
-      }
+    const cfg = YEARS.find(y=>y.year===year);
+    const layer = L.geoJSON(gj,{
+      style:{color:cfg.color,fillColor:cfg.color,fillOpacity:S.opacity*.35,weight:2.5,opacity:S.opacity},
+      onEachFeature:(ft,lyr)=>lyr.bindPopup(`
+        <div style="font-family:Inter,sans-serif">
+          <b style="color:${cfg.color}">● Cauce ${year}</b><br/>
+          <small>${cfg.sat}</small><br/>
+          <small style="color:#666">Área aprox: ${calcAreaKm2(ft.geometry).toFixed(4)} km²</small>
+        </div>`)
     }).addTo(map);
 
-    state.layers[year]  = layer;
-    state.loaded[year]  = true;
-    state.feats[year]   = geojson.features?.length || 0;
+    S.layers[year]=layer; S.loaded[year]=true;
+    S.feats[year]=gj.features.length;
+    S.areas[year]=gj.features.reduce((s,f)=>s+calcAreaKm2(f.geometry),0);
 
-    const card = document.getElementById(`card-${year}`);
-    card.classList.add('loaded', 'active');
+    document.getElementById(`card-${year}`).classList.add('active');
+    setStat(year,'ok',`✓ ${S.feats[year]} polígonos · ${S.areas[year].toFixed(2)} km²`);
+    updateCharts();
+    showToast(`✅ ${year} cargado · ${S.feats[year]} polígonos`);
 
-    setStatus(year, 'ok', `✓ ${state.feats[year]} polígonos cargados`);
-    updateStats();
-    showToast(`✅ ${year} cargado · ${state.feats[year]} polígonos`);
-
-    // Zoom al primer año cargado
-    const loaded = Object.values(state.layers).filter(Boolean);
-    if (loaded.length === 1) map.fitBounds(layer.getBounds(), { padding: [40,40] });
-
-  } catch(err) {
-    setStatus(year, 'err', '❌ Error al leer el KML');
+    const loaded=Object.values(S.layers).filter(Boolean);
+    if(loaded.length===1) map.fitBounds(layer.getBounds(),{padding:[40,40]});
+  }catch(err){
+    setStat(year,'err','❌ Error al leer KML');
     console.error(err);
   }
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  KML → GeoJSON (parser nativo, sin dependencias extra)
-// ═══════════════════════════════════════════════════════════════
-function kmlToGeoJSON(xml) {
-  const features = [];
-  const placemarks = xml.getElementsByTagName('Placemark');
-
-  for (const pm of placemarks) {
-    const name = pm.getElementsByTagName('name')[0]?.textContent || '';
-    const geoms = [];
-
-    // Polygon
-    for (const poly of pm.getElementsByTagName('Polygon')) {
-      const outer = poly.getElementsByTagName('outerBoundaryIs')[0];
-      if (!outer) continue;
-      const coords = parseCoords(outer.getElementsByTagName('coordinates')[0]?.textContent);
-      const holes  = [];
-      for (const inner of poly.getElementsByTagName('innerBoundaryIs')) {
-        holes.push(parseCoords(inner.getElementsByTagName('coordinates')[0]?.textContent));
-      }
-      geoms.push({ type: 'Polygon', coordinates: [coords, ...holes] });
+function kmlToGeoJSON(xml){
+  const feats=[];
+  for(const pm of xml.getElementsByTagName('Placemark')){
+    const name=pm.getElementsByTagName('name')[0]?.textContent||'';
+    const geoms=[];
+    for(const poly of pm.getElementsByTagName('Polygon')){
+      const outer=poly.getElementsByTagName('outerBoundaryIs')[0];
+      if(!outer)continue;
+      const coords=parseCoords(outer.getElementsByTagName('coordinates')[0]?.textContent);
+      const holes=[];
+      for(const inn of poly.getElementsByTagName('innerBoundaryIs'))
+        holes.push(parseCoords(inn.getElementsByTagName('coordinates')[0]?.textContent));
+      geoms.push({type:'Polygon',coordinates:[coords,...holes]});
     }
-
-    // MultiGeometry
-    if (geoms.length === 0) {
-      for (const mg of pm.getElementsByTagName('MultiGeometry')) {
-        for (const poly of mg.getElementsByTagName('Polygon')) {
-          const outer = poly.getElementsByTagName('outerBoundaryIs')[0];
-          if (!outer) continue;
-          const coords = parseCoords(outer.getElementsByTagName('coordinates')[0]?.textContent);
-          geoms.push({ type: 'Polygon', coordinates: [coords] });
-        }
-      }
-    }
-
-    if (geoms.length === 0) continue;
-
-    const geometry = geoms.length === 1 ? geoms[0] : { type: 'GeometryCollection', geometries: geoms };
-    features.push({ type: 'Feature', properties: { name }, geometry });
+    if(!geoms.length)continue;
+    feats.push({type:'Feature',properties:{name},
+      geometry:geoms.length===1?geoms[0]:{type:'GeometryCollection',geometries:geoms}});
   }
-
-  return { type: 'FeatureCollection', features };
+  return{type:'FeatureCollection',features:feats};
 }
 
-function parseCoords(raw) {
-  if (!raw) return [];
-  return raw.trim().split(/\s+/).map(pair => {
-    const [lng, lat] = pair.split(',').map(Number);
-    return [lng, lat];
-  }).filter(c => !isNaN(c[0]) && !isNaN(c[1]));
+function parseCoords(raw){
+  if(!raw)return[];
+  return raw.trim().split(/\s+/).map(p=>{
+    const[lng,lat]=p.split(',').map(Number);
+    return[lng,lat];
+  }).filter(c=>!isNaN(c[0])&&!isNaN(c[1]));
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+//  ÁREA APROXIMADA (Shoelace · esfera)
+// ═══════════════════════════════════════════════════════════
+function calcAreaKm2(geom){
+  if(!geom)return 0;
+  if(geom.type==='Polygon') return Math.abs(shoelaceKm2(geom.coordinates[0]));
+  if(geom.type==='GeometryCollection')
+    return geom.geometries.reduce((s,g)=>s+calcAreaKm2(g),0);
+  return 0;
+}
+function shoelaceKm2(ring){
+  let a=0; const R=6371; const n=ring.length;
+  for(let i=0;i<n;i++){
+    const[lng1,lat1]=ring[i], [lng2,lat2]=ring[(i+1)%n];
+    const dLng=(lng2-lng1)*Math.PI/180;
+    const mLat=(lat1+lat2)/2*Math.PI/180;
+    a+= dLng * Math.sin(mLat);
+  }
+  return Math.abs(a)*R*R/2;
+}
+
+// ═══════════════════════════════════════════════════════════
 //  TOGGLE CAPAS
-// ═══════════════════════════════════════════════════════════════
-function toggleYear(year, btn) {
+// ═══════════════════════════════════════════════════════════
+function togYear(year,btn){
   btn.classList.toggle('on');
-  const visible = btn.classList.contains('on');
-  state.visible[year] = visible;
-
-  if (state.layers[year]) {
-    if (visible) map.addLayer(state.layers[year]);
-    else          map.removeLayer(state.layers[year]);
-  }
-
-  const card = document.getElementById(`card-${year}`);
-  if (visible) card.classList.add('active');
-  else          card.classList.remove('active');
+  const vis=btn.classList.contains('on');
+  S.visible[year]=vis;
+  if(S.layers[year]){ if(vis)map.addLayer(S.layers[year]); else map.removeLayer(S.layers[year]); }
+  document.getElementById(`card-${year}`).classList.toggle('active',vis&&!!S.loaded[year]);
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  OPACIDAD
-// ═══════════════════════════════════════════════════════════════
-function updateOpacity(val) {
-  state.opacity = val / 100;
-  document.getElementById('opacityVal').textContent = val + '%';
-  Object.values(state.layers).forEach(lyr => {
-    if (lyr) lyr.setStyle({
-      opacity:     state.opacity,
-      fillOpacity: state.opacity * 0.4
+// ═══════════════════════════════════════════════════════════
+//  ANIMATION
+// ═══════════════════════════════════════════════════════════
+const ANIM_STEPS = [null,...YEARS.map(y=>y.year)]; // 0=all, 1-4=year
+
+function goToAnimIdx(idx){
+  S.animIdx=idx;
+  const slider=document.getElementById('animSlider');
+  slider.value=idx;
+  slider.style.setProperty('--pct', (idx/4*100)+'%');
+
+  // Update dots
+  ANIM_STEPS.forEach((_,i)=>{
+    document.getElementById(`dot-${i}`).classList.toggle('active',i===idx);
+  });
+
+  const yearDisplay=document.getElementById('animYearDisplay');
+  if(idx===0){
+    yearDisplay.textContent='Todos';
+    YEARS.forEach(y=>{
+      if(S.layers[y.year]){
+        map.addLayer(S.layers[y.year]);
+        S.layers[y.year].setStyle({opacity:S.opacity,fillOpacity:S.opacity*.35});
+      }
     });
+  } else {
+    const activeYear=YEARS[idx-1].year;
+    yearDisplay.textContent=activeYear;
+    yearDisplay.style.color=YEARS[idx-1].color;
+    YEARS.forEach((y,i)=>{
+      if(!S.layers[y.year])return;
+      if(y.year===activeYear){
+        map.addLayer(S.layers[y.year]);
+        S.layers[y.year].setStyle({opacity:S.opacity,fillOpacity:S.opacity*.35,weight:3});
+        S.layers[y.year].bringToFront();
+      } else {
+        S.layers[y.year].setStyle({opacity:0.08,fillOpacity:0.04,weight:1});
+        map.addLayer(S.layers[y.year]);
+      }
+    });
+  }
+}
+
+function onSliderChange(val){
+  goToAnimIdx(+val);
+}
+
+function showAll(){ if(S.playing)stopPlay(); goToAnimIdx(0); }
+
+function togglePlay(){
+  if(S.playing) stopPlay(); else startPlay();
+}
+
+function startPlay(){
+  S.playing=true;
+  const btn=document.getElementById('playBtn');
+  btn.textContent='⏸'; btn.classList.add('playing');
+  if(S.animIdx===0 || S.animIdx>=4) goToAnimIdx(1);
+  S.playTimer=setInterval(()=>{
+    const next=S.animIdx>=4?1:S.animIdx+1;
+    goToAnimIdx(next);
+  },2000);
+}
+
+function stopPlay(){
+  S.playing=false;
+  const btn=document.getElementById('playBtn');
+  btn.textContent='▶'; btn.classList.remove('playing');
+  clearInterval(S.playTimer);
+}
+
+function animStep(dir){
+  stopPlay();
+  const next=Math.max(0,Math.min(4,S.animIdx+dir));
+  goToAnimIdx(next);
+}
+
+// init dots
+goToAnimIdx(0);
+
+// ═══════════════════════════════════════════════════════════
+//  CHARTS
+// ═══════════════════════════════════════════════════════════
+function toggleCharts(){
+  S.chartsOpen=!S.chartsOpen;
+  const panel=document.getElementById('chartsPanel');
+  const btn=document.getElementById('chartToggleBtn');
+  const lbl=document.getElementById('chartBtnLbl');
+  panel.classList.toggle('open',S.chartsOpen);
+  btn.classList.toggle('active',S.chartsOpen);
+  lbl.textContent=S.chartsOpen?'Ocultar gráficas':'Ver gráficas';
+  if(S.chartsOpen && !S.chartsBuilt){ buildCharts(); S.chartsBuilt=true; }
+  setTimeout(()=>{ if(S.barChart)S.barChart.resize(); if(S.lineChart)S.lineChart.resize(); },400);
+}
+
+const CHART_FONT = {family:"Inter, sans-serif", size:10};
+const gridColor  = 'rgba(255,255,255,0.05)';
+const tickColor  = '#475569';
+
+function buildCharts(){
+  const yrs = YEARS.map(y=>y.year);
+  const areas= yrs.map(y=>+(S.areas[y]||0).toFixed(3));
+  const feats= yrs.map(y=>S.feats[y]||0);
+  const colors= YEARS.map(y=>y.color);
+
+  // Bar chart — área
+  const bCtx=document.getElementById('barChart').getContext('2d');
+  S.barChart = new Chart(bCtx,{
+    type:'bar',
+    data:{
+      labels:yrs,
+      datasets:[{
+        label:'Área (km²)',data:areas,
+        backgroundColor:colors.map(c=>c+'55'),
+        borderColor:colors,borderWidth:2,borderRadius:5,
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{titleFont:CHART_FONT,bodyFont:CHART_FONT}},
+      scales:{
+        x:{ticks:{color:tickColor,font:CHART_FONT},grid:{color:gridColor}},
+        y:{ticks:{color:tickColor,font:CHART_FONT},grid:{color:gridColor},title:{display:true,text:'km²',color:tickColor,font:CHART_FONT}},
+      }
+    }
+  });
+
+  // Line chart — tendencia polígonos
+  const lCtx=document.getElementById('lineChart').getContext('2d');
+  S.lineChart = new Chart(lCtx,{
+    type:'line',
+    data:{
+      labels:yrs,
+      datasets:[{
+        label:'Polígonos detectados',data:feats,
+        borderColor:'#38bdf8',backgroundColor:'rgba(56,189,248,.1)',
+        pointBackgroundColor:colors,pointBorderColor:colors,
+        pointRadius:6,pointHoverRadius:8,
+        borderWidth:2,fill:true,tension:0.35,
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{titleFont:CHART_FONT,bodyFont:CHART_FONT}},
+      scales:{
+        x:{ticks:{color:tickColor,font:CHART_FONT},grid:{color:gridColor}},
+        y:{ticks:{color:tickColor,font:CHART_FONT},grid:{color:gridColor}},
+      }
+    }
+  });
+
+  // Summary table
+  const tbl=document.getElementById('summaryTable');
+  tbl.innerHTML = YEARS.map(y=>{
+    const a=(S.areas[y.year]||0).toFixed(3);
+    const f=S.feats[y.year]||0;
+    const trend = y.year>2006 ? (S.areas[y.year]>(S.areas[2006]||0)?'▲':'▼') : '—';
+    return `<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+      <span style="color:${y.color}">● ${y.year}</span>
+      <span>${a} km²</span>
+      <span style="color:${trend==='▲'?'#34d399':trend==='▼'?'#f87171':'#94a3b8'}">${trend}</span>
+    </div>`;
+  }).join('');
+}
+
+function updateCharts(){
+  if(!S.chartsBuilt) return;
+  const areas= YEARS.map(y=>+(S.areas[y.year]||0).toFixed(3));
+  const feats= YEARS.map(y=>S.feats[y.year]||0);
+  S.barChart.data.datasets[0].data=areas; S.barChart.update();
+  S.lineChart.data.datasets[0].data=feats; S.lineChart.update();
+  const tbl=document.getElementById('summaryTable');
+  tbl.innerHTML=YEARS.map(y=>{
+    const a=(S.areas[y.year]||0).toFixed(3);
+    const trend=y.year>2006?(S.areas[y.year]>(S.areas[2006]||0)?'▲':'▼'):'—';
+    return`<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+      <span style="color:${y.color}">● ${y.year}</span><span>${a} km²</span>
+      <span style="color:${trend==='▲'?'#34d399':trend==='▼'?'#f87171':'#94a3b8'}">${trend}</span></div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  OPACITY
+// ═══════════════════════════════════════════════════════════
+function setOpacity(v){
+  S.opacity=v/100;
+  document.getElementById('opVal').textContent=v+'%';
+  Object.values(S.layers).forEach(l=>{
+    if(l)l.setStyle({opacity:S.opacity,fillOpacity:S.opacity*.35});
   });
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  MAPA BASE
-// ═══════════════════════════════════════════════════════════════
-function setBasemap(name) {
-  map.removeLayer(basemaps[state.basemap]);
-  basemaps[name].addTo(map);
-  // Asegurar que los layers de datos queden encima
-  Object.values(state.layers).forEach(l => { if (l) l.bringToFront(); });
-  state.basemap = name;
-  document.querySelectorAll('.basemap-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(`btn-${name}`).classList.add('active');
+// ═══════════════════════════════════════════════════════════
+//  BASEMAP
+// ═══════════════════════════════════════════════════════════
+function setBasemap(name){
+  map.removeLayer(TILES[S.basemap]);
+  TILES[name].addTo(map);
+  Object.values(S.layers).forEach(l=>{if(l)l.bringToFront()});
+  S.basemap=name;
+  document.querySelectorAll('.bm-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(`bm-${name}`).classList.add('active');
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  ESTADÍSTICAS
-// ═══════════════════════════════════════════════════════════════
-function updateStats() {
-  const nLoaded = Object.values(state.loaded).filter(Boolean).length;
-  document.getElementById('stat-layers').textContent = `${nLoaded}/4`;
-
-  const total = Object.values(state.feats).reduce((a,b) => a + b, 0);
-  document.getElementById('stat-feats').textContent = total > 0 ? total.toLocaleString() : '—';
-
-  if (nLoaded > 0) {
-    document.getElementById('stat-area').textContent = '~1.052 km² · Caldas';
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
 //  HELPERS
-// ═══════════════════════════════════════════════════════════════
-function setStatus(year, type, msg) {
-  const el = document.getElementById(`status-${year}`);
-  el.className = `year-status ${type === 'ok' ? 'ok' : type === 'loading' ? 'waiting' : 'waiting'}`;
-  el.innerHTML = type === 'loading'
-    ? `<span class="loader"></span> <span>Procesando...</span>`
-    : `<span>${msg}</span>`;
+// ═══════════════════════════════════════════════════════════
+function setStat(year,type,msg){
+  const el=document.getElementById(`st-${year}`);
+  el.className=`y-stat ${type==='ok'?'ok':''}`;
+  el.innerHTML=type==='loading'?`<span class="spin"></span> <span>Procesando…</span>`:`<span>${msg}</span>`;
 }
 
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
 }
 </script>
 </body>
