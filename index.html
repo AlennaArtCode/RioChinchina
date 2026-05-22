@@ -285,6 +285,25 @@
       </div>
     </div>
 
+    <!-- VERIFICACIÓN OSM -->
+    <div class="sec">
+      <div class="sec-t">✅ Verificación de identidad</div>
+      <div style="font-size:10px;color:var(--muted2);line-height:1.6;margin-bottom:10px">
+        Carga el trazado oficial del <b style="color:#fff">Río Chinchiná</b> desde
+        <b style="color:#38bdf8">OpenStreetMap</b> para confirmar que los polígonos
+        detectados corresponden al cauce correcto.
+      </div>
+      <button id="osmBtn" onclick="loadOSMRiver()" style="
+        width:100%;padding:9px;border-radius:8px;border:1px solid rgba(56,189,248,.3);
+        background:rgba(56,189,248,.08);color:var(--accent);font-size:11px;font-weight:600;
+        cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;
+        transition:all .2s;font-family:Inter,sans-serif">
+        <span id="osmBtnIcon">🌐</span>
+        <span id="osmBtnLbl">Cargar río oficial (OSM)</span>
+      </button>
+      <div id="osmStatus" style="font-size:10px;color:var(--muted2);margin-top:8px;display:none"></div>
+    </div>
+
     <!-- METODOLOGÍA -->
     <div class="sec">
       <div class="sec-t">ℹ Metodología</div>
@@ -322,6 +341,10 @@
         <div class="leg-i"><div class="leg-l" style="background:var(--c12)"></div>2012 · Landsat 7</div>
         <div class="leg-i"><div class="leg-l" style="background:var(--c18)"></div>2018 · Landsat 8</div>
         <div class="leg-i"><div class="leg-l" style="background:var(--c26)"></div>2026 · Landsat 9</div>
+        <div class="leg-i" id="osmLegendRow" style="display:none">
+          <div class="leg-l" style="background:#fff;border-top:2px dashed #fff"></div>
+          Río Chinchiná (OSM oficial)
+        </div>
       </div>
     </div>
 
@@ -797,6 +820,99 @@ function setOpacity(v){
   Object.values(S.layers).forEach(l=>{
     if(l)l.setStyle({opacity:S.opacity,fillOpacity:S.opacity*.35});
   });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  OSM VERIFICATION LAYER
+// ═══════════════════════════════════════════════════════════
+let osmLayer = null;
+
+async function loadOSMRiver(){
+  const btn  = document.getElementById('osmBtn');
+  const lbl  = document.getElementById('osmBtnLbl');
+  const icon = document.getElementById('osmBtnIcon');
+  const stat = document.getElementById('osmStatus');
+
+  // Toggle off if already loaded
+  if(osmLayer){
+    map.removeLayer(osmLayer); osmLayer=null;
+    lbl.textContent='Cargar río oficial (OSM)';
+    icon.textContent='🌐';
+    btn.style.borderColor='rgba(56,189,248,.3)';
+    stat.style.display='none';
+    document.getElementById('osmLegendRow').style.display='none';
+    return;
+  }
+
+  lbl.textContent='Cargando desde OSM…';
+  icon.textContent='⏳';
+  stat.style.display='block';
+  stat.textContent='Consultando Overpass API…';
+
+  // Overpass query: waterways named Chinchiná in the bounding box
+  const query = `
+    [out:json][timeout:30];
+    (
+      way["waterway"]["name"~"Chinchi",i](4.80,-75.93,5.16,-75.30);
+      relation["waterway"]["name"~"Chinchi",i](4.80,-75.93,5.16,-75.30);
+    );
+    out geom;
+  `;
+
+  try{
+    const resp = await fetch('https://overpass-api.de/api/interpreter',{
+      method:'POST', body:'data='+encodeURIComponent(query)
+    });
+    const data = await resp.json();
+
+    if(!data.elements || data.elements.length===0){
+      stat.textContent='⚠️ No se encontraron ríos con ese nombre en OSM.';
+      lbl.textContent='Sin resultados'; icon.textContent='⚠️'; return;
+    }
+
+    // Build GeoJSON from OSM ways
+    const features = data.elements
+      .filter(e=>e.type==='way' && e.geometry)
+      .map(e=>({
+        type:'Feature',
+        properties:{name:e.tags?.name||'Río Chinchiná', osm_id:e.id},
+        geometry:{type:'LineString', coordinates:e.geometry.map(n=>[n.lon,n.lat])}
+      }));
+
+    const gj = {type:'FeatureCollection', features};
+
+    osmLayer = L.geoJSON(gj,{
+      style:{
+        color:'#ffffff', weight:3, opacity:0.9,
+        dashArray:'8,5', lineCap:'round'
+      },
+      onEachFeature:(ft,lyr)=>lyr.bindPopup(`
+        <div style="font-family:Inter,sans-serif">
+          <b>✅ ${ft.properties.name}</b><br/>
+          <small style="color:#666">Fuente: OpenStreetMap</small><br/>
+          <small style="color:#999">OSM ID: ${ft.properties.osm_id}</small><br/>
+          <small style="color:#38bdf8;font-size:10px">Esta es la línea oficial del río.<br/>Compara con los polígonos de colores.</small>
+        </div>`)
+    }).addTo(map);
+
+    // Bring KML layers to front
+    Object.values(S.layers).forEach(l=>{ if(l) l.bringToFront(); });
+
+    const n = features.length;
+    stat.innerHTML = `<span style="color:#34d399">✓ ${n} tramo(s) del Río Chinchiná cargado(s) desde OSM.</span><br/>
+      <span style="color:#94a3b8">Línea blanca punteada = cauce oficial.<br/>Si coincide con los polígonos de colores, ¡la detección es correcta!</span>`;
+    lbl.textContent='Ocultar río oficial';
+    icon.textContent='✅';
+    btn.style.borderColor='rgba(52,211,153,.4)';
+    btn.style.color='#34d399';
+    document.getElementById('osmLegendRow').style.display='flex';
+    showToast(`✅ Río Chinchiná OSM: ${n} tramo(s) cargado(s)`);
+
+  }catch(err){
+    stat.textContent='❌ Error al consultar Overpass API. Intenta de nuevo.';
+    lbl.textContent='Reintentar'; icon.textContent='🔄';
+    console.error(err);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
