@@ -304,18 +304,60 @@
       <div id="osmStatus" style="font-size:10px;color:var(--muted2);margin-top:8px;display:none"></div>
     </div>
 
+    <!-- DATOS DEL RÍO -->
+    <div class="sec">
+      <div class="sec-t">📖 Datos del Río Chinchiná</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
+        <div style="background:var(--surface3);border:1px solid var(--border);border-radius:7px;padding:8px 10px">
+          <div style="font-size:15px;font-weight:700;color:var(--accent)">~69 km</div>
+          <div style="font-size:9px;color:var(--muted2)">Longitud total</div>
+        </div>
+        <div style="background:var(--surface3);border:1px solid var(--border);border-radius:7px;padding:8px 10px">
+          <div style="font-size:15px;font-weight:700;color:var(--accent)">1.052 km²</div>
+          <div style="font-size:9px;color:var(--muted2)">Área cuenca</div>
+        </div>
+        <div style="background:var(--surface3);border:1px solid var(--border);border-radius:7px;padding:8px 10px">
+          <div style="font-size:15px;font-weight:700;color:#34d399">3.600 m</div>
+          <div style="font-size:9px;color:var(--muted2)">Altitud nacimiento</div>
+        </div>
+        <div style="background:var(--surface3);border:1px solid var(--border);border-radius:7px;padding:8px 10px">
+          <div style="font-size:15px;font-weight:700;color:#f59e0b">~800 m</div>
+          <div style="font-size:9px;color:var(--muted2)">Altitud desembocadura</div>
+        </div>
+        <div style="background:var(--surface3);border:1px solid var(--border);border-radius:7px;padding:8px 10px;grid-column:1/-1">
+          <div style="font-size:15px;font-weight:700;color:#f97316">500.000+</div>
+          <div style="font-size:9px;color:var(--muted2)">Personas abastecidas de agua potable</div>
+        </div>
+      </div>
+      <div style="font-size:10px;color:var(--muted2);line-height:1.7;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:10px 11px">
+        <b style="color:var(--accent)">Nombre:</b> Del Quimbaya, <i>"Río de Oro"</i><br/>
+        <b style="color:var(--text)">Municipios:</b> Manizales, Villamaría, Chinchiná, Palestina, Neira<br/>
+        <b style="color:var(--text)">Microcuencas:</b> 61 identificadas (POMCA 2016)<br/>
+        <b style="color:var(--text)">Afluentes:</b> Río Claro, Río Guacaica, Qda. Olivares, Qda. Nereidas<br/>
+        <b style="color:#fbbf24">Uso:</b> Agua potable · Hidroeléctrica (CHEC desde 1946) · Caficultura<br/>
+        <b style="color:#ef4444">Riesgo:</b> Lahárico (Nevado del Ruiz), torrencial, deslizamientos<br/>
+        <b style="color:var(--text)">Autoridad:</b> CORPOCALDAS · POMCA Res. 411/2016
+      </div>
+    </div>
+
+    <!-- EVENTOS HISTÓRICOS -->
+    <div class="sec">
+      <div class="sec-t">⚡ Eventos históricos</div>
+      <div id="eventosList" style="display:flex;flex-direction:column;gap:5px"></div>
+    </div>
+
     <!-- METODOLOGÍA -->
     <div class="sec">
       <div class="sec-t">ℹ Metodología</div>
       <div style="font-size:10px;color:var(--muted2);line-height:1.7;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:10px 11px">
-        <b style="color:var(--text)">MNDWI</b> = (Verde − SWIR) / (Verde + SWIR)<br/>
-        Umbral: <b style="color:var(--accent)">MNDWI &gt; 0.05</b> → píxeles de agua<br/>
-        Resolución espacial: <b style="color:var(--text)">30 m</b> (Landsat)<br/>
-        Procesamiento: <b style="color:var(--text)">Google Earth Engine</b>
+        <b style="color:var(--text)">v3:</b> JRC Global Surface Water (2006–2018)<br/>
+        <b style="color:var(--text)">v3:</b> MNDWI&gt;0.08 + corredor 5km OSM (2026)<br/>
+        Resolución: <b style="color:var(--accent)">30 m</b> · Procesamiento: <b style="color:var(--text)">GEE</b><br/>
+        Fuente: <b style="color:var(--text)">NASA/Google JRC · CORPOCALDAS · POMCA</b>
       </div>
     </div>
 
-    <div class="s-foot">Alenna Art Code · 2026 · Google Earth Engine API</div>
+    <div class="s-foot">Alenna Art Code · 2026 · GEE · CORPOCALDAS · JRC</div>
   </aside>
 
   <!-- ════════════════════════════════ MAP AREA -->
@@ -408,12 +450,41 @@ const YEARS = [
 ];
 
 const POIS = [
-  {name:'Manizales',       alt:'Capital de Caldas · 2.153 m',  lat:5.0703,  lng:-75.5138, icon:'🏙', color:'#f8fafc'},
-  {name:'Villamaría',      alt:'Municipio · 1.700 m',           lat:5.0283,  lng:-75.5053, icon:'🏘', color:'#cbd5e1'},
-  {name:'Chinchiná',       alt:'Municipio cafetero · 1.370 m', lat:4.9811,  lng:-75.6072, icon:'☕', color:'#92400e'},
-  {name:'Palestina',       alt:'Municipio · 1.075 m',           lat:5.0408,  lng:-75.7003, icon:'🌿', color:'#4ade80'},
-  {name:'Nevado del Ruiz', alt:'Volcán · 5.321 m s.n.m.',      lat:4.8924,  lng:-75.3247, icon:'🌋', color:'#7dd3fc'},
-  {name:'Desembocadura',   alt:'→ Río Cauca · 860 m',           lat:4.8700,  lng:-75.8900, icon:'💧', color:'#38bdf8'},
+  {name:'Manizales',       alt:'Capital de Caldas · 2.153 m s.n.m.',  lat:5.0675,  lng:-75.5100, icon:'🏙', color:'#f8fafc'},
+  {name:'Villamaría',      alt:'Cuenca alta · 1.700 m s.n.m.',        lat:5.0455,  lng:-75.5152, icon:'🏘', color:'#cbd5e1'},
+  {name:'Chinchiná',       alt:'Sede Cenicafé · 1.370 m s.n.m.',      lat:4.9805,  lng:-75.6075, icon:'☕', color:'#d97706'},
+  {name:'Palestina',       alt:'Cuenca media · 1.075 m s.n.m.',       lat:5.0194,  lng:-75.6233, icon:'🌿', color:'#4ade80'},
+  {name:'Nevado del Ruiz', alt:'Volcán activo · 5.321 m s.n.m.',      lat:4.8924,  lng:-75.3247, icon:'🌋', color:'#7dd3fc'},
+  {name:'Desembocadura',   alt:'→ Río Cauca · ~800 m s.n.m.',         lat:5.1390,  lng:-75.6790, icon:'💧', color:'#38bdf8'},
+  {name:'Bocatoma CHEC',   alt:'Captación hidroeléctrica (desde 1946)',lat:5.0500,  lng:-75.4800, icon:'⚡', color:'#fbbf24'},
+  {name:'Puente Parma',    alt:'Hito de ingeniería · post-lahar 1985', lat:5.0100,  lng:-75.5500, icon:'🌉', color:'#a78bfa'},
+];
+
+const EVENTOS_HISTORICOS = [
+  {
+    lat:4.9805, lng:-75.6075, year:1985, icon:'🌊',
+    title:'Lahar 13-Nov-1985',
+    desc:'La erupción del Nevado del Ruiz derritió el casquete glaciar. El lahar descendió por las quebradas Nereidas y Molinos hasta el Río Chinchiná. <b>~3.000 víctimas</b> en Chinchiná (trabajadores de la cosecha cafetera). Conocida como la "tragedia silenciosa" opacada por Armero.',
+    color:'#ef4444',
+  },
+  {
+    lat:5.0100, lng:-75.5500, year:1986, icon:'🌉',
+    title:'Puente Doménico Parma (1986)',
+    desc:'Construido para reemplazar los puentes destruidos por el lahar de 1985. Puente colgante de una sola torre, hito de ingeniería colombiana. Parte de la Autopista del Café (Manizales–Chinchiná).',
+    color:'#a78bfa',
+  },
+  {
+    lat:5.0400, lng:-75.5800, year:2011, icon:'⚠️',
+    title:'Avalancha sector Gallinazo (Dic 2011)',
+    desc:'Flujo de lodo y piedras durante La Niña 2010–2011. Afectó viviendas rurales de Manizales, tuberías de agua y gas. El río es de carácter torrencial: +68% de caudal sobre la media durante La Niña.',
+    color:'#f97316',
+  },
+  {
+    lat:5.0194, lng:-75.6233, year:2017, icon:'🌱',
+    title:'Fondo VivoCuenca (2017)',
+    desc:'Mecanismo financiero y de gobernanza creado por Corpocaldas, CHEC, Aguas de Manizales y EMAS. Financia PSA (Pago por Servicios Ambientales), restauración de ecosistemas y conservación de páramos.',
+    color:'#34d399',
+  },
 ];
 
 // ═══════════════════════════════════════════════════════════
@@ -709,6 +780,52 @@ function animStep(dir){
 
 // init dots
 goToAnimIdx(0);
+
+// ═══════════════════════════════════════════════════════════
+//  EVENTOS HISTÓRICOS — Marcadores en mapa + lista sidebar
+// ═══════════════════════════════════════════════════════════
+const eventosList = document.getElementById('eventosList');
+
+EVENTOS_HISTORICOS.forEach(ev => {
+  // Marcador en mapa
+  const evIcon = L.divIcon({
+    className: '',
+    html: `<div style="
+      width:30px;height:30px;border-radius:50%;
+      background:rgba(8,13,24,.92);border:2px solid ${ev.color};
+      display:flex;align-items:center;justify-content:center;
+      font-size:13px;box-shadow:0 0 10px ${ev.color};
+      cursor:pointer;transition:transform .2s;
+    ">${ev.icon}</div>`,
+    iconSize:[30,30], iconAnchor:[15,15],
+  });
+  L.marker([ev.lat, ev.lng], {icon: evIcon})
+    .addTo(map)
+    .bindPopup(`
+      <div style="font-family:Inter,sans-serif;max-width:220px">
+        <div style="font-size:13px;font-weight:700;color:${ev.color};margin-bottom:4px">${ev.icon} ${ev.title}</div>
+        <div style="font-size:10px;color:#94a3b8;margin-bottom:6px">Año ${ev.year}</div>
+        <div style="font-size:11px;color:#334155;line-height:1.5">${ev.desc}</div>
+      </div>`);
+
+  // Item en sidebar
+  const item = document.createElement('div');
+  item.style.cssText = `display:flex;align-items:flex-start;gap:8px;padding:8px 10px;
+    border-radius:7px;background:var(--surface3);border:1px solid var(--border);
+    cursor:pointer;border-left:3px solid ${ev.color};`;
+  item.innerHTML = `
+    <span style="font-size:14px;flex-shrink:0">${ev.icon}</span>
+    <div>
+      <div style="font-size:10px;font-weight:600;color:#e2e8f0">${ev.title}</div>
+      <div style="font-size:9px;color:${ev.color};margin-top:1px">Año ${ev.year}</div>
+    </div>`;
+  item.onclick = () => {
+    map.setView([ev.lat, ev.lng], 13);
+  };
+  item.onmouseenter = () => item.style.background = 'var(--surface2)';
+  item.onmouseleave = () => item.style.background = 'var(--surface3)';
+  eventosList.appendChild(item);
+});
 
 // ═══════════════════════════════════════════════════════════
 //  CHARTS
