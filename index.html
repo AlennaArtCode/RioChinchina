@@ -736,11 +736,12 @@
 //  CONFIG
 // ═══════════════════════════════════════════════════════════
 const YEARS = [
-  {year:2006, sat:'JRC (Landsat 5)',   color:'#f59e0b'},
-  {year:2012, sat:'JRC (Landsat 7)',   color:'#f97316'},
-  {year:2018, sat:'Sentinel-2 (10m)',  color:'#22d3ee'},
-  {year:2025, sat:'Sentinel-2 (10m)',  color:'#a78bfa'},
-  {year:2026, sat:'Sentinel-2 (10m)',  color:'#34d399'},
+  {id:'2006',       year:2006, sat:'JRC (Landsat 5)',   color:'#f59e0b'},
+  {id:'2012',       year:2012, sat:'JRC (Landsat 7)',   color:'#f97316'},
+  {id:'2018',       year:2018, sat:'Sentinel-2 (10m)',  color:'#22d3ee'},
+  {id:'2025',       year:2025, sat:'Sentinel-2 (10m)',  color:'#a78bfa'},
+  {id:'2025_nicfi', year:2025, sat:'Planet NICFI (4.8m)',color:'#c084fc'},
+  {id:'2026',       year:2026, sat:'Sentinel-2 (10m)',  color:'#34d399'},
 ];
 
 const POIS = [
@@ -793,7 +794,7 @@ const S = {
   chartsOpen:false, chartsBuilt:false,
   barChart:null, lineChart:null,
 };
-YEARS.forEach(y => S.visible[y.year] = true);
+YEARS.forEach(y => S.visible[y.id] = true);
 
 // ═══════════════════════════════════════════════════════════
 //  MAP
@@ -852,27 +853,29 @@ POIS.forEach(p=>{
 //  YEAR CARDS
 // ═══════════════════════════════════════════════════════════
 const yCardsEl = document.getElementById('yCards');
-YEARS.forEach(({year,sat,color})=>{
+YEARS.forEach(({id,year,sat,color})=>{
   const c = document.createElement('div');
-  c.className='y-card'; c.id=`card-${year}`;
+  c.className='y-card'; c.id=`card-${id}`;
   c.style.setProperty('--yc',color);
+  const label = id === '2025_nicfi' ? '2025 (Planet)' : year;
   c.innerHTML=`
     <div class="y-card-h">
       <div class="y-dot"></div>
-      <div><div class="y-lbl">${year}</div><div class="y-sat">${sat}</div></div>
-      <button class="y-tog on" id="tog-${year}" onclick="togYear(${year},this)"></button>
+      <div><div class="y-lbl">${label}</div><div class="y-sat">${sat}</div></div>
+      <button class="y-tog on" id="tog-${id}" onclick="togYear('${id}',this)"></button>
     </div>
-    <div class="y-stat" id="st-${year}">Esperando KML…</div>`;
+    <div class="y-stat" id="st-${id}">Esperando KML…</div>`;
   yCardsEl.appendChild(c);
 });
 // ═══════════════════════════════════════════════════════════
 //  LEGEND DYNAMIC ITEMS
 // ═══════════════════════════════════════════════════════════
 const legendItemsEl = document.getElementById('legendItems');
-YEARS.forEach(({year,sat,color})=>{
+YEARS.forEach(({id,year,sat,color})=>{
   const item = document.createElement('div');
   item.className='leg-i';
-  item.innerHTML=`<div class="leg-l" style="background:${color}"></div>${year} · ${sat}`;
+  const label = id === '2025_nicfi' ? '2025 (Planet)' : year;
+  item.innerHTML=`<div class="leg-l" style="background:${color}"></div>${label} · ${sat}`;
   legendItemsEl.appendChild(item);
 });
 
@@ -880,7 +883,7 @@ YEARS.forEach(({year,sat,color})=>{
 //  ANIMATION DOTS
 // ═══════════════════════════════════════════════════════════
 const dotsEl = document.getElementById('animDots');
-[{label:'Todos',color:'#64748b'},...YEARS.map(y=>({label:y.year,color:y.color}))].forEach((d,i)=>{
+[{label:'Todos',color:'#64748b'},...YEARS.map(y=>({label:y.id==='2025_nicfi'?'2025 (Planet)':y.year,color:y.color}))].forEach((d,i)=>{
   const dot = document.createElement('div');
   dot.className='anim-dot';dot.id=`dot-${i}`;
   dot.style.setProperty('--dot-color',d.color);
@@ -902,11 +905,17 @@ dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remov
 
 function handleFiles(files){
   [...files].forEach(f=>{
-    const m=f.name.match(/(\d{4})/); if(!m)return;
-    const yr=+m[1]; if(!YEARS.find(y=>y.year===yr))return;
-    setStat(yr,'loading','');
+    let id = null;
+    if (f.name.includes('nicfi')) {
+      id = '2025_nicfi';
+    } else {
+      const m = f.name.match(/(\d{4})/);
+      if (m) id = m[1];
+    }
+    if (!id || !YEARS.find(y => y.id === id)) return;
+    setStat(id,'loading','');
     const r=new FileReader();
-    r.onload=e=>parseAndLoad(yr,e.target.result);
+    r.onload=e=>parseAndLoad(id,e.target.result);
     r.readAsText(f);
   });
 }
@@ -914,32 +923,33 @@ function handleFiles(files){
 // ═══════════════════════════════════════════════════════════
 //  KML → GEOJSON
 // ═══════════════════════════════════════════════════════════
-function parseAndLoad(year, kmlText){
+function parseAndLoad(id, kmlText){
   try{
     const xml = new DOMParser().parseFromString(kmlText,'text/xml');
     const gj  = kmlToGeoJSON(xml);
-    if(S.layers[year]) map.removeLayer(S.layers[year]);
+    if(S.layers[id]) map.removeLayer(S.layers[id]);
 
-    const cfg = YEARS.find(y=>y.year===year);
+    const cfg = YEARS.find(y=>y.id===id);
+    const label = id === '2025_nicfi' ? '2025 (Planet)' : cfg.year;
     const layer = L.geoJSON(gj,{
       renderer: mapRenderer,
       style:{color:cfg.color,fillColor:cfg.color,fillOpacity:S.opacity*.5,weight:4,opacity:S.opacity},
       onEachFeature:(ft,lyr)=>lyr.bindPopup(`
         <div style="font-family:Inter,sans-serif">
-          <b style="color:${cfg.color}">● Cauce ${year}</b><br/>
+          <b style="color:${cfg.color}">● Cauce ${label}</b><br/>
           <small>${cfg.sat}</small><br/>
           <small style="color:#666">Área aprox: ${calcAreaKm2(ft.geometry).toFixed(4)} km²</small>
         </div>`)
     }).addTo(map);
 
-    S.layers[year]=layer; S.loaded[year]=true;
-    S.feats[year]=gj.features.length;
-    S.areas[year]=gj.features.reduce((s,f)=>s+calcAreaKm2(f.geometry),0);
+    S.layers[id]=layer; S.loaded[id]=true;
+    S.feats[id]=gj.features.length;
+    S.areas[id]=gj.features.reduce((s,f)=>s+calcAreaKm2(f.geometry),0);
 
-    document.getElementById(`card-${year}`).classList.add('active');
-    setStat(year,'ok',`✓ ${S.feats[year]} polígonos · ${S.areas[year].toFixed(2)} km²`);
+    document.getElementById(`card-${id}`).classList.add('active');
+    setStat(id,'ok',`✓ ${S.feats[id]} polígonos · ${S.areas[id].toFixed(2)} km²`);
     updateCharts();
-    showToast(`✅ ${year} cargado · ${S.feats[year]} polígonos`);
+    showToast(`✅ ${label} cargado · ${S.feats[id]} polígonos`);
 
     // fitBounds tras cada carga — siempre centra en los datos reales
     const allBounds = Object.values(S.layers)
@@ -951,7 +961,7 @@ function parseAndLoad(year, kmlText){
       map.fitBounds(combined, {padding:[50,50], maxZoom:14});
     }
   }catch(err){
-    setStat(year,'err','❌ Error al leer KML');
+    setStat(id,'err','❌ Error al leer KML');
     console.error(err);
   }
 }
@@ -1010,18 +1020,18 @@ function shoelaceKm2(ring){
 // ═══════════════════════════════════════════════════════════
 //  TOGGLE CAPAS
 // ═══════════════════════════════════════════════════════════
-function togYear(year,btn){
+function togYear(id,btn){
   btn.classList.toggle('on');
   const vis=btn.classList.contains('on');
-  S.visible[year]=vis;
-  if(S.layers[year]){ if(vis)map.addLayer(S.layers[year]); else map.removeLayer(S.layers[year]); }
-  document.getElementById(`card-${year}`).classList.toggle('active',vis&&!!S.loaded[year]);
+  S.visible[id]=vis;
+  if(S.layers[id]){ if(vis)map.addLayer(S.layers[id]); else map.removeLayer(S.layers[id]); }
+  document.getElementById(`card-${id}`).classList.toggle('active',vis&&!!S.loaded[id]);
 }
 
 // ═══════════════════════════════════════════════════════════
 //  ANIMATION
 // ═══════════════════════════════════════════════════════════
-const ANIM_STEPS = [null,...YEARS.map(y=>y.year)]; // 0=all, 1..N=year
+const ANIM_STEPS = [null,...YEARS.map(y=>y.id)]; // 0=all, 1..N=year id
 
 // Dynamically set slider max based on number of steps
 document.getElementById('animSlider').max = YEARS.length;
@@ -1041,24 +1051,25 @@ function goToAnimIdx(idx){
   if(idx===0){
     yearDisplay.textContent='Todos';
     YEARS.forEach(y=>{
-      if(S.layers[y.year]){
-        map.addLayer(S.layers[y.year]);
-        S.layers[y.year].setStyle({opacity:S.opacity,fillOpacity:S.opacity*.35});
+      if(S.layers[y.id]){
+        map.addLayer(S.layers[y.id]);
+        S.layers[y.id].setStyle({opacity:S.opacity,fillOpacity:S.opacity*.35});
       }
     });
   } else {
-    const activeYear=YEARS[idx-1].year;
-    yearDisplay.textContent=activeYear;
+    const activeId=YEARS[idx-1].id;
+    const label=activeId==='2025_nicfi'?'2025*':YEARS[idx-1].year;
+    yearDisplay.textContent=label;
     yearDisplay.style.color=YEARS[idx-1].color;
     YEARS.forEach((y,i)=>{
-      if(!S.layers[y.year])return;
-      if(y.year===activeYear){
-        map.addLayer(S.layers[y.year]);
-        S.layers[y.year].setStyle({opacity:S.opacity,fillOpacity:S.opacity*.35,weight:3});
-        S.layers[y.year].bringToFront();
+      if(!S.layers[y.id])return;
+      if(y.id===activeId){
+        map.addLayer(S.layers[y.id]);
+        S.layers[y.id].setStyle({opacity:S.opacity,fillOpacity:S.opacity*.35,weight:3});
+        S.layers[y.id].bringToFront();
       } else {
-        S.layers[y.year].setStyle({opacity:0.08,fillOpacity:0.04,weight:1});
-        map.addLayer(S.layers[y.year]);
+        S.layers[y.id].setStyle({opacity:0.08,fillOpacity:0.04,weight:1});
+        map.addLayer(S.layers[y.id]);
       }
     });
   }
@@ -1221,11 +1232,12 @@ function buildCharts(){
   // Summary table
   const tbl=document.getElementById('summaryTable');
   tbl.innerHTML = YEARS.map(y=>{
-    const a=(S.areas[y.year]||0).toFixed(3);
-    const f=S.feats[y.year]||0;
-    const trend = y.year>2006 ? (S.areas[y.year]>(S.areas[2006]||0)?'▲':'▼') : '—';
+    const a=(S.areas[y.id]||0).toFixed(3);
+    const label = y.id === '2025_nicfi' ? '2025 (Planet)' : y.year;
+    const yrNum = typeof y.year === 'string' ? parseInt(y.year) : y.year;
+    const trend = yrNum>2006 ? (S.areas[y.id]>(S.areas['2006']||0)?'▲':'▼') : '—';
     return `<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.05)">
-      <span style="color:${y.color}">● ${y.year}</span>
+      <span style="color:${y.color}">● ${label}</span>
       <span>${a} km²</span>
       <span style="color:${trend==='▲'?'#34d399':trend==='▼'?'#f87171':'#94a3b8'}">${trend}</span>
     </div>`;
@@ -1234,16 +1246,18 @@ function buildCharts(){
 
 function updateCharts(){
   if(!S.chartsBuilt) return;
-  const areas= YEARS.map(y=>+(S.areas[y.year]||0).toFixed(3));
-  const feats= YEARS.map(y=>S.feats[y.year]||0);
+  const areas= YEARS.map(y=>+(S.areas[y.id]||0).toFixed(3));
+  const feats= YEARS.map(y=>S.feats[y.id]||0);
   S.barChart.data.datasets[0].data=areas; S.barChart.update();
   S.lineChart.data.datasets[0].data=feats; S.lineChart.update();
   const tbl=document.getElementById('summaryTable');
   tbl.innerHTML=YEARS.map(y=>{
-    const a=(S.areas[y.year]||0).toFixed(3);
-    const trend=y.year>2006?(S.areas[y.year]>(S.areas[2006]||0)?'▲':'▼'):'—';
+    const a=(S.areas[y.id]||0).toFixed(3);
+    const label = y.id === '2025_nicfi' ? '2025 (Planet)' : y.year;
+    const yrNum = typeof y.year === 'string' ? parseInt(y.year) : y.year;
+    const trend=yrNum>2006?(S.areas[y.id]>(S.areas['2006']||0)?'▲':'▼'):'—';
     return`<div style="display:flex;justify-content:space-between;padding:2px 0;border-bottom:1px solid rgba(255,255,255,.05)">
-      <span style="color:${y.color}">● ${y.year}</span><span>${a} km²</span>
+      <span style="color:${y.color}">● ${label}</span><span>${a} km²</span>
       <span style="color:${trend==='▲'?'#34d399':trend==='▼'?'#f87171':'#94a3b8'}">${trend}</span></div>`;
   }).join('');
 }
@@ -1384,7 +1398,7 @@ function showToast(msg){
 async function autoLoadKMLs() {
   let anyLoaded = false;
   for (const y of YEARS) {
-    const filename = `cauce_rio_chinchina_${y.year}_v6.kml`;
+    const filename = `cauce_rio_chinchina_${y.id}_v6.kml`;
     const paths = [
       `./${filename}`,
       `./kml/${filename}`,
@@ -1402,7 +1416,7 @@ async function autoLoadKMLs() {
           if (text.includes('<kml') || text.includes('<KML') || text.includes('<?xml')) {
             // Solo cargar si tiene polígonos reales (> 500 bytes)
             if (text.length > 500) {
-              parseAndLoad(y.year, text);
+              parseAndLoad(y.id, text);
               loaded = true;
               anyLoaded = true;
               break;
@@ -1414,7 +1428,7 @@ async function autoLoadKMLs() {
       }
     }
     if (!loaded) {
-      setStat(y.year, 'waiting', 'Esperando KML…');
+      setStat(y.id, 'waiting', 'Esperando KML…');
     }
   }
 
