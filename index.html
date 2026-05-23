@@ -10,6 +10,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet"/>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    };
+  </script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -230,6 +239,208 @@
       #app{flex-direction:column}
       #chartsPanel.open{height:180px}
     }
+
+    /* ── MODAL DE PÍXEL MIXTO ── */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(4, 7, 13, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .modal-overlay.show {
+      display: flex;
+      opacity: 1;
+    }
+    .modal-content {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 85vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      transform: scale(0.95);
+      transition: transform 0.3s ease;
+      scrollbar-width: thin;
+      scrollbar-color: var(--surface3) transparent;
+    }
+    .modal-content::-webkit-scrollbar {
+      width: 4px;
+    }
+    .modal-content::-webkit-scrollbar-thumb {
+      background: var(--surface3);
+      border-radius: 2px;
+    }
+    .modal-overlay.show .modal-content {
+      transform: scale(1);
+    }
+    .modal-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(160deg,#0a1020 0%,#0f1e35 100%);
+    }
+    .modal-header h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--muted2);
+      font-size: 24px;
+      cursor: pointer;
+      line-height: 1;
+      transition: color 0.15s;
+    }
+    .modal-close:hover {
+      color: #ef4444;
+    }
+    .modal-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      font-size: 12px;
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .equation-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      text-align: center;
+    }
+    .equation {
+      font-family: 'Space Grotesk', monospace;
+      font-size: 13px;
+      color: var(--accent);
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .equation-desc {
+      font-size: 10px;
+      color: var(--muted2);
+    }
+    .sim-container {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      background: var(--surface2);
+    }
+    .sim-container h3 {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #f1f5f9;
+    }
+    .sim-control {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      font-size: 11px;
+    }
+    .sim-control label {
+      color: var(--text);
+      font-weight: 500;
+    }
+    .sim-control input[type="range"] {
+      width: 50%;
+      accent-color: var(--accent);
+    }
+    .sim-display {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .sim-grid-container {
+      width: 250px;
+      height: 150px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      position: relative;
+      overflow: hidden;
+      background: #14532d; /* background land (green) */
+      flex-shrink: 0;
+    }
+    .sim-river-bg {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(circle at 125px -40px, transparent 110px, #0369a1 110px, #0369a1 150px, transparent 150px);
+    }
+    .sim-grid {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      display: grid;
+    }
+    .sim-cell {
+      border: 1px solid rgba(255,255,255,0.06);
+      box-sizing: border-box;
+      transition: background 0.15s ease;
+    }
+    .sim-cell.land { background: transparent; }
+    .sim-cell.water { background: rgba(56,189,248,0.7); box-shadow: inset 0 0 4px rgba(56,189,248,0.5); }
+    .sim-cell.mixed { background: rgba(234,179,8,0.45); }
+
+    .sim-stats {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 200px;
+    }
+    .sim-stat-box {
+      background: var(--surface3);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 10px;
+      display: flex;
+      flex-direction: column;
+    }
+    .sim-stat-title {
+      font-size: 9px;
+      color: var(--muted2);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .sim-stat-value {
+      font-size: 11px;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+    .modal-text-block h4 {
+      font-size: 12px;
+      font-weight: 700;
+      color: #f1f5f9;
+      margin-bottom: 6px;
+    }
+    .modal-text-block ul {
+      padding-left: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .modal-text-block li {
+      list-style-type: disc;
+    }
   </style>
 </head>
 <body>
@@ -355,6 +566,9 @@
         Corredor: <b style="color:var(--accent)">800 m buffer</b> desde OSM oficial<br/>
         Procesamiento: <b style="color:var(--text)">Google Earth Engine (GEE)</b>
       </div>
+      <button class="info-btn" onclick="openModal('pixelModal')" style="width:100%;margin-top:8px;padding:8px 10px;background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.25);border-radius:7px;color:var(--accent);font-size:10px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s">
+        <span>🔬 Teoría del Píxel Mixto</span>
+      </button>
     </div>
 
     <div class="s-foot">Alenna Art Code · 2026 · GEE · CORPOCALDAS · JRC</div>
@@ -374,15 +588,24 @@
         📊 <span id="chartBtnLbl">Ver gráficas</span>
       </div>
 
+      <!-- Zoom al río -->
+      <div class="map-pill" id="zoomRiverBtn" onclick="zoomToData()"
+           style="top:14px;left:50%;transform:translateX(-50%);cursor:pointer;
+                  display:flex;align-items:center;gap:6px;font-size:11px;
+                  font-weight:600;color:#38bdf8;border-color:rgba(56,189,248,.3);
+                  transition:all .2s;"
+           onmouseover="this.style.borderColor='rgba(56,189,248,.6)';this.style.color='#7dd3fc'"
+           onmouseout="this.style.borderColor='rgba(56,189,248,.3)';this.style.color='#38bdf8'">
+        🎯 Zoom al cauce
+      </div>
+
       <div class="map-pill" id="mapCoords">— coords —</div>
+
 
       <!-- Legend -->
       <div id="legend">
         <div class="leg-t">Cauce por año</div>
-        <div class="leg-i"><div class="leg-l" style="background:var(--c06)"></div>2006 · JRC (Landsat 5)</div>
-        <div class="leg-i"><div class="leg-l" style="background:var(--c12)"></div>2012 · JRC (Landsat 7)</div>
-        <div class="leg-i"><div class="leg-l" style="background:var(--c18)"></div>2018 · S-2 (10m)</div>
-        <div class="leg-i"><div class="leg-l" style="background:var(--c26)"></div>2026 · S-2 (10m)</div>
+        <div id="legendItems"></div>
         <div class="leg-i" id="osmLegendRow" style="display:none">
           <div class="leg-l" style="background:#fff;border-top:2px dashed #fff"></div>
           Río Chinchiná (OSM oficial)
@@ -436,7 +659,77 @@
   </div>
 </div>
 
+<!-- Modal de Píxel Mixto -->
+<div id="pixelModal" class="modal-overlay" onclick="if(event.target===this)closeModal('pixelModal')">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>🔬 Teoría del Píxel Mixto y Reflectancia</h2>
+      <button class="modal-close" onclick="closeModal('pixelModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p>
+        El Río Chinchiná es un río estrecho de montaña. En teledetección espacial, la resolución del satélite determina la precisión de la delimitación del cauce debido al fenómeno del <strong>píxel mixto (mixel)</strong>.
+      </p>
+      
+      <div class="equation-box">
+        <div class="equation">
+          $$\rho_{\text{compuesta}}(\lambda) = f_{\text{agua}} \cdot \rho_{\text{agua}}(\lambda) + (1 - f_{\text{agua}}) \cdot \rho_{\text{ribera}}(\lambda)$$
+        </div>
+        <div class="equation-desc">
+          Ecuación del píxel mixto: $\rho_{\text{compuesta}}$ es la reflectancia registrada, $f_{\text{agua}}$ es la fracción de agua, y $\rho_{\text{agua}}$ / $\rho_{\text{ribera}}$ son las firmas espectrales puras de agua y vegetación/tierra.
+        </div>
+      </div>
+
+      <div class="sim-container">
+        <h3>🎛️ Simulador de Resolución Espectral</h3>
+        <p style="margin-bottom:12px;font-size:11px;color:var(--muted2)">
+          Mueve el control para cambiar la resolución y observa cómo el sensor satelital "ve" el cauce (azul=agua pura, verde=tierra pura, amarillo=píxel mixto).
+        </p>
+        
+        <div class="sim-control">
+          <label>Resolución del Sensor: <span id="simResVal" style="color:var(--accent);font-weight:600">30m</span></label>
+          <input type="range" id="simResSlider" min="10" max="30" step="10" value="30" oninput="updateSim(this.value)">
+        </div>
+
+        <div class="sim-display">
+          <div class="sim-grid-container">
+            <div class="sim-river-bg"></div>
+            <div id="simGrid" class="sim-grid"></div>
+          </div>
+          <div class="sim-stats">
+            <div class="sim-stat-box">
+              <span class="sim-stat-title">Tamaño de Píxel</span>
+              <span class="sim-stat-value" id="simResText">30m × 30m</span>
+            </div>
+            <div class="sim-stat-box">
+              <span class="sim-stat-title">Área del Píxel</span>
+              <span class="sim-stat-value" id="simAreaText">900 m²</span>
+            </div>
+            <div class="sim-stat-box">
+              <span class="sim-stat-title">Píxeles Puros de Agua</span>
+              <span class="sim-stat-value" id="simPureText" style="color:#f59e0b">Bajo (Fragmentado)</span>
+            </div>
+            <div class="sim-stat-box">
+              <span class="sim-stat-title">Efecto de Borde / Error</span>
+              <span class="sim-stat-value" id="simErrorText" style="color:#ef4444">Alto (Sobreestimación)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-text-block">
+        <h4>💡 Explicación Científica de las Áreas</h4>
+        <ul style="margin-top:6px;">
+          <li><strong>Landsat 5/7 (30m · 900 m²):</strong> Al ser celdas grandes, la reflectancia de agua se mezcla con la vegetación de la ribera, haciendo que casi todo el río se "invisibilice" (baja reflectancia de agua total). En los pocos puntos donde es detectado, se clasifica el píxel completo de 30m como agua, lo que infla localmente el área (efecto de borde).</li>
+          <li><strong>Sentinel-2 (10m · 100 m²):</strong> Con celdas 9 veces menores, la fracción de agua $f_{\text{agua}}$ en el píxel del cauce tiende a $1.0$. El píxel se comporta de forma pura, permitiendo delinear de manera limpia el cauce real y depurando el área a ~0.20 km² eliminando falsos bordes.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
+
 
 <script>
 // ═══════════════════════════════════════════════════════════
@@ -446,6 +739,7 @@ const YEARS = [
   {year:2006, sat:'JRC (Landsat 5)',   color:'#f59e0b'},
   {year:2012, sat:'JRC (Landsat 7)',   color:'#f97316'},
   {year:2018, sat:'Sentinel-2 (10m)',  color:'#22d3ee'},
+  {year:2025, sat:'Sentinel-2 (10m)',  color:'#a78bfa'},
   {year:2026, sat:'Sentinel-2 (10m)',  color:'#34d399'},
 ];
 
@@ -454,7 +748,7 @@ const POIS = [
   {name:'Villamaría',      alt:'Cuenca alta · 1.700 m s.n.m.',        lat:5.0455,  lng:-75.5152, icon:'🏘', color:'#cbd5e1'},
   {name:'Chinchiná',       alt:'Sede Cenicafé · 1.370 m s.n.m.',      lat:4.9805,  lng:-75.6075, icon:'☕', color:'#d97706'},
   {name:'Palestina',       alt:'Cuenca media · 1.075 m s.n.m.',       lat:5.0194,  lng:-75.6233, icon:'🌿', color:'#4ade80'},
-  {name:'Nevado del Ruiz', alt:'Volcán activo · 5.321 m s.n.m.',      lat:4.8924,  lng:-75.3247, icon:'🌋', color:'#7dd3fc'},
+  {name:'Nevado del Ruiz', alt:'Volcán activo · 5.380 m s.n.m.',      lat:4.8924,  lng:-75.3247, icon:'🌋', color:'#7dd3fc'},
   {name:'Desembocadura',   alt:'→ Río Cauca · ~800 m s.n.m.',         lat:5.1390,  lng:-75.6790, icon:'💧', color:'#38bdf8'},
   {name:'Bocatoma CHEC',   alt:'Captación hidroeléctrica (desde 1946)',lat:5.0500,  lng:-75.4800, icon:'⚡', color:'#fbbf24'},
   {name:'Puente Parma',    alt:'Hito de ingeniería · post-lahar 1985', lat:5.0100,  lng:-75.5500, icon:'🌉', color:'#a78bfa'},
@@ -492,18 +786,22 @@ const EVENTOS_HISTORICOS = [
 // ═══════════════════════════════════════════════════════════
 const S = {
   layers:{}, loaded:{}, feats:{}, areas:{},
-  visible:{2006:true,2012:true,2018:true,2026:true},
+  visible:{},
   opacity:0.80, basemap:'dark',
-  animIdx:0,    // 0=all, 1..4=year index
+  animIdx:0,    // 0=all, 1..N=year index
   playing:false, playTimer:null,
   chartsOpen:false, chartsBuilt:false,
   barChart:null, lineChart:null,
 };
+YEARS.forEach(y => S.visible[y.year] = true);
 
 // ═══════════════════════════════════════════════════════════
 //  MAP
 // ═══════════════════════════════════════════════════════════
-const map = L.map('map',{center:[5.0,-75.62],zoom:11,zoomControl:true});
+const mapRenderer = L.canvas({ padding: 0.5 });
+const map = L.map('map',{center:[5.07,-75.57],zoom:13,zoomControl:true,preferCanvas:true});
+
+
 
 const TILES = {
   dark:      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',      {attribution:'© CartoDB',maxZoom:19}),
@@ -567,6 +865,16 @@ YEARS.forEach(({year,sat,color})=>{
     <div class="y-stat" id="st-${year}">Esperando KML…</div>`;
   yCardsEl.appendChild(c);
 });
+// ═══════════════════════════════════════════════════════════
+//  LEGEND DYNAMIC ITEMS
+// ═══════════════════════════════════════════════════════════
+const legendItemsEl = document.getElementById('legendItems');
+YEARS.forEach(({year,sat,color})=>{
+  const item = document.createElement('div');
+  item.className='leg-i';
+  item.innerHTML=`<div class="leg-l" style="background:${color}"></div>${year} · ${sat}`;
+  legendItemsEl.appendChild(item);
+});
 
 // ═══════════════════════════════════════════════════════════
 //  ANIMATION DOTS
@@ -614,7 +922,8 @@ function parseAndLoad(year, kmlText){
 
     const cfg = YEARS.find(y=>y.year===year);
     const layer = L.geoJSON(gj,{
-      style:{color:cfg.color,fillColor:cfg.color,fillOpacity:S.opacity*.35,weight:2.5,opacity:S.opacity},
+      renderer: mapRenderer,
+      style:{color:cfg.color,fillColor:cfg.color,fillOpacity:S.opacity*.5,weight:4,opacity:S.opacity},
       onEachFeature:(ft,lyr)=>lyr.bindPopup(`
         <div style="font-family:Inter,sans-serif">
           <b style="color:${cfg.color}">● Cauce ${year}</b><br/>
@@ -632,13 +941,21 @@ function parseAndLoad(year, kmlText){
     updateCharts();
     showToast(`✅ ${year} cargado · ${S.feats[year]} polígonos`);
 
-    const loaded=Object.values(S.layers).filter(Boolean);
-    if(loaded.length===1) map.fitBounds(layer.getBounds(),{padding:[40,40]});
+    // fitBounds tras cada carga — siempre centra en los datos reales
+    const allBounds = Object.values(S.layers)
+      .filter(Boolean)
+      .map(l => l.getBounds())
+      .filter(b => b.isValid());
+    if(allBounds.length > 0){
+      const combined = allBounds.reduce((acc, b) => acc.extend(b), allBounds[0]);
+      map.fitBounds(combined, {padding:[50,50], maxZoom:14});
+    }
   }catch(err){
     setStat(year,'err','❌ Error al leer KML');
     console.error(err);
   }
 }
+
 
 function kmlToGeoJSON(xml){
   const feats=[];
@@ -704,13 +1021,16 @@ function togYear(year,btn){
 // ═══════════════════════════════════════════════════════════
 //  ANIMATION
 // ═══════════════════════════════════════════════════════════
-const ANIM_STEPS = [null,...YEARS.map(y=>y.year)]; // 0=all, 1-4=year
+const ANIM_STEPS = [null,...YEARS.map(y=>y.year)]; // 0=all, 1..N=year
+
+// Dynamically set slider max based on number of steps
+document.getElementById('animSlider').max = YEARS.length;
 
 function goToAnimIdx(idx){
   S.animIdx=idx;
   const slider=document.getElementById('animSlider');
   slider.value=idx;
-  slider.style.setProperty('--pct', (idx/4*100)+'%');
+  slider.style.setProperty('--pct', (idx/YEARS.length*100)+'%');
 
   // Update dots
   ANIM_STEPS.forEach((_,i)=>{
@@ -758,9 +1078,9 @@ function startPlay(){
   S.playing=true;
   const btn=document.getElementById('playBtn');
   btn.textContent='⏸'; btn.classList.add('playing');
-  if(S.animIdx===0 || S.animIdx>=4) goToAnimIdx(1);
+  if(S.animIdx===0 || S.animIdx>=YEARS.length) goToAnimIdx(1);
   S.playTimer=setInterval(()=>{
-    const next=S.animIdx>=4?1:S.animIdx+1;
+    const next=S.animIdx>=YEARS.length?1:S.animIdx+1;
     goToAnimIdx(next);
   },2000);
 }
@@ -774,7 +1094,7 @@ function stopPlay(){
 
 function animStep(dir){
   stopPlay();
-  const next=Math.max(0,Math.min(4,S.animIdx+dir));
+  const next=Math.max(0,Math.min(YEARS.length,S.animIdx+dir));
   goToAnimIdx(next);
 }
 
@@ -999,6 +1319,7 @@ async function loadOSMRiver(){
     const gj = {type:'FeatureCollection', features};
 
     osmLayer = L.geoJSON(gj,{
+      renderer: mapRenderer,
       style:{
         color:'#ffffff', weight:3, opacity:0.9,
         dashArray:'8,5', lineCap:'round'
@@ -1057,6 +1378,194 @@ function showToast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg; t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// Auto-load KML files from local folder if they exist
+async function autoLoadKMLs() {
+  let anyLoaded = false;
+  for (const y of YEARS) {
+    const filename = `cauce_rio_chinchina_${y.year}_v6.kml`;
+    const paths = [
+      `./${filename}`,
+      `./kml/${filename}`,
+      `./RioChinchina_KML_v6/${filename}`,
+      `./RioChinchina_KML/${filename}`
+    ];
+    
+    let loaded = false;
+    for (const path of paths) {
+      try {
+        const url = window.location.protocol === 'file:' ? path : `${path}?t=${Date.now()}`;
+        const resp = await fetch(url);
+        if (resp.ok) {
+          const text = await resp.text();
+          if (text.includes('<kml') || text.includes('<KML') || text.includes('<?xml')) {
+            // Solo cargar si tiene polígonos reales (> 500 bytes)
+            if (text.length > 500) {
+              parseAndLoad(y.year, text);
+              loaded = true;
+              anyLoaded = true;
+              break;
+            }
+          }
+        }
+      } catch (e) {
+        // Keep trying other paths
+      }
+    }
+    if (!loaded) {
+      setStat(y.year, 'waiting', 'Esperando KML…');
+    }
+  }
+
+  // Cargar el trazado oficial OSM automáticamente al inicio
+  // para dar contexto geográfico al río
+  if (anyLoaded) {
+    setTimeout(() => {
+      if (!osmLayer) loadOSMRiver();
+    }, 1500);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+//  MODAL INTERACTIVITY
+// ═══════════════════════════════════════════════════════════
+function openModal(id) {
+  const el = document.getElementById(id);
+  el.style.display = 'flex';
+  setTimeout(() => el.classList.add('show'), 10);
+  if (id === 'pixelModal') {
+    updateSim(document.getElementById('simResSlider').value);
+  }
+}
+function closeModal(id) {
+  const el = document.getElementById(id);
+  el.classList.remove('show');
+  setTimeout(() => el.style.display = 'none', 300);
+}
+
+function updateSim(val) {
+  const gridEl = document.getElementById('simGrid');
+  gridEl.innerHTML = '';
+  
+  let cols, rows;
+  let resText, areaText, pureText, errorText, pureColor, errorColor;
+  
+  const numVal = parseInt(val);
+  if (numVal >= 25) {
+    // 30m
+    cols = 5; rows = 3;
+    resText = '30m × 30m';
+    areaText = '900 m²';
+    pureText = 'Mínimo (Casi todo mixto)';
+    pureColor = '#f59e0b';
+    errorText = 'Máximo (Invisibilidad y saltos)';
+    errorColor = '#ef4444';
+    document.getElementById('simResVal').textContent = '30m (Landsat 5/7)';
+  } else if (numVal >= 15) {
+    // 20m
+    cols = 10; rows = 6;
+    resText = '20m × 20m';
+    areaText = '400 m²';
+    pureText = 'Bajo (Bordes fragmentados)';
+    pureColor = '#f97316';
+    errorText = 'Alto (Efecto de borde considerable)';
+    errorColor = '#f97316';
+    document.getElementById('simResVal').textContent = '20m (Bandas SWIR originales)';
+  } else {
+    // 10m
+    cols = 25; rows = 15;
+    resText = '10m × 10m';
+    areaText = '100 m²';
+    pureText = 'Máximo (Delineación limpia)';
+    pureColor = '#34d399';
+    errorText = 'Mínimo (Error de borde reducido)';
+    errorColor = '#34d399';
+    document.getElementById('simResVal').textContent = '10m (Sentinel-2)';
+  }
+  
+  gridEl.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  gridEl.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+  
+  const cellW = 250 / cols;
+  const cellH = 150 / rows;
+  
+  // River function
+  function isWater(x, y) {
+    const dx = x - 125;
+    const dy = y + 40;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    return dist >= 110 && dist <= 150;
+  }
+  
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'sim-cell';
+      
+      const xL = c * cellW;
+      const xR = (c + 1) * cellW;
+      const yT = r * cellH;
+      const yB = (r + 1) * cellH;
+      const xC = xL + cellW/2;
+      const yC = yT + cellH/2;
+      
+      const samples = [
+        isWater(xL, yT),
+        isWater(xR, yT),
+        isWater(xL, yB),
+        isWater(xR, yB),
+        isWater(xC, yC)
+      ];
+      
+      const waterCount = samples.filter(Boolean).length;
+      if (waterCount === 5) {
+        cell.classList.add('water');
+      } else if (waterCount > 0) {
+        cell.classList.add('mixed');
+      } else {
+        cell.classList.add('land');
+      }
+      
+      gridEl.appendChild(cell);
+    }
+  }
+  
+  document.getElementById('simResText').textContent = resText;
+  document.getElementById('simAreaText').textContent = areaText;
+  
+  const pureEl = document.getElementById('simPureText');
+  pureEl.textContent = pureText;
+  pureEl.style.color = pureColor;
+  
+  const errorEl = document.getElementById('simErrorText');
+  errorEl.textContent = errorText;
+  errorEl.style.color = errorColor;
+  
+  // Re-trigger MathJax rendering if loaded
+  if (window.MathJax && typeof window.MathJax.typeset === 'function') {
+    window.MathJax.typeset();
+  }
+}
+
+// Call on startup
+autoLoadKMLs();
+
+// ═══════════════════════════════════════════════════════════
+//  ZOOM AL CAUCE
+// ═══════════════════════════════════════════════════════════
+function zoomToData(){
+  const validBounds = Object.values(S.layers)
+    .filter(Boolean)
+    .map(l => l.getBounds())
+    .filter(b => b.isValid());
+  if(validBounds.length === 0){
+    // Fallback: conocemos la ubicación del río Chinchiná
+    map.setView([5.07, -75.57], 13);
+    return;
+  }
+  const combined = validBounds.reduce((acc, b) => acc.extend(b), validBounds[0]);
+  map.fitBounds(combined, {padding:[60,60], maxZoom:15});
 }
 </script>
 </body>

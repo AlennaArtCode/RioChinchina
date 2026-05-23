@@ -1,0 +1,1109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document>
+<Placemark>
+  <ExtendedData>
+    <Data name='proyecto'>
+      <value>AlennaArtCode / 2026</value>
+    </Data>
+    <Data name='version'>
+      <value>v10</value>
+    </Data>
+    <Data name='metodo'>
+      <value>Mediana-sin-SCL|MNDWI&gt;=0.05|NIR&lt;0.15|SWIR&lt;0.1|20m|EPSG:32618</value>
+    </Data>
+    <Data name='satelite'>
+      <value>Sentinel-2 MSI 20m</value>
+    </Data>
+    <Data name='rio'>
+      <value>Rio Chinchina</value>
+    </Data>
+    <Data name='anno'>
+      <value>2018</value>
+    </Data>
+    <Data name='area_m2'>
+      <value>804.0361681722397</value>
+    </Data>
+    <Data name='count'>
+      <value>2</value>
+    </Data>
+    <Data name='system:index'>
+      <value>+21238+28401</value>
+    </Data>
+    <Data name='agua'>
+      <value>1</value>
+    </Data>
+  </ExtendedData>
+  <Polygon>
+    <outerBoundaryIs>
+      <LinearRing>
+        <coordinates>-75.67885756356738,5.13873671954099 -75.67885718057964,5.138374881710858 -75.67867673800973,5.138375073680835 -75.67867712088967,5.138736911519949 -75.67885756356738,5.13873671954099 </coordinates>
+      </LinearRing>
+    </outerBoundaryIs>
+  </Polygon>
+</Placemark><Placemark>
+  <ExtendedData>
+    <Data name='proyecto'>
+      <value>AlennaArtCode / 2026</value>
+    </Data>
+    <Data name='version'>
+      <value>v10</value>
+    </Data>
+    <Data name='metodo'>
+      <value>Mediana-sin-SCL|MNDWI&gt;=0.05|NIR&lt;0.15|SWIR&lt;0.1|20m|EPSG:32618</value>
+    </Data>
+    <Data name='satelite'>
+      <value>Sentinel-2 MSI 20m</value>
+    </Data>
+    <Data name='rio'>
+      <value>Rio Chinchina</value>
+    </Data>
+    <Data name='anno'>
+      <value>2018</value>
+    </Data>
+    <Data name='area_m2'>
+      <value>2412.1090770899173</value>
+    </Data>
+    <Data name='count'>
+      <value>6</value>
+    </Data>
+    <Data name='system:index'>
+      <value>+21239+28398</value>
+    </Data>
+    <Data name='agua'>
+      <value>1</value>
+    </Data>
+  </ExtendedData>
+  <MultiGeometry>
+    <Polygon>
+      <outerBoundaryIs>
+        <LinearRing>
+          <coordinates>-75.67849591267665,5.138013427730847 -75.67849552994943,5.137651589864783 -75.67831508755918,5.137651781700012 -75.67831489626295,5.1374708627624885 -75.67795401157228,5.137471246271249 -75.67795420277868,5.137652165217756 -75.67813464516894,5.137651973490326 -75.67813483642924,5.137832892436832 -75.67831527887338,5.137832700646519 -75.6783154701876,5.138013619584043 -75.67849591267665,5.138013427730847 </coordinates>
+        </LinearRing>
+      </outerBoundaryIs>
+    </Polygon>
+    <Polygon>
+      <outerBoundaryIs>
+        <LinearRing>
+          <coordinates>-75.67849591267665,5.138013427730847 -75.67849610404477,5.138194346659388 -75.67867654657874,5.138194154752294 -75.67867635515674,5.138013235832736 -75.67849591267665,5.138013427730847 </coordinates>
+        </LinearRing>
+      </outerBoundaryIs>
+    </Polygon>
+  </MultiGeometry>
+</Placemark><Placemark>
+  <ExtendedData>
+    <Data name='proyecto'>
+      <value>AlennaArtCode / 2026</value>
+    </Data>
+    <Data name='version'>
+      <value>v10</value>
+    </Data>
+    <Data name='metodo'>
+      <value>Mediana-sin-SCL|MNDWI&gt;=0.05|NIR&lt;0.15|SWIR&lt;0.1|20m|EPSG:32618</value>
+    </Data>
+    <Data name='satelite'>
+      <value>Sentinel-2 MSI 20m</value>
+    </Data>
+    <Data name='rio'>
+      <value>Rio Chinchina</value>
+    </Data>
+    <Data name='anno'>
+      <value>2018</value>
+    </Data>
+    <Data name='area_m2'>
+      <value>1206.0556703330276</value>
+    </Data>
+    <Data name='count'>
+      <value>3</value>
+    </Data>
+    <Data name='system:index'>
+      <value>+21252+28382</value>
+    </Data>
+    <Data name='agua'>
+      <value>1</value>
+    </Data>
+  </ExtendedData>
+  <Polygon>
+    <outerBoundaryIs>
+      <LinearRing>
+        <coordinates>-75.67632774177254,5.135301941253061 -75.67632716982418,5.134759184170996 -75.67614672817953,5.134759375287572 -75.67614729996619,5.135302132396587 -75.67632774177254,5.135301941253061 </coordinates>
+      </LinearRing>
+    </outerBoundaryIs>
+  </Polygon>
+</Placemark><Placemark>
+  <ExtendedData>
+    <Data name='proyecto'>
+      <value>AlennaArtCode / 2026</value>
+    </Data>
+    <Data name='version'>
+      <value>v10</value>
+    </Data>
+    <Data name='metodo'>
+      <value>Mediana-sin-SCL|MNDWI&gt;=0.05|NIR&lt;0.15|SWIR&lt;0.1|20m|EPSG:32618</value>
+    </Data>
+    <Data name='satelite'>
+      <value>Sentinel-2 MSI 20m</value>
+    </Data>
+    <Data name='rio'>
+      <value>Rio Chinchina</value>
+    </Data>
+    <Data name='anno'>
+      <value>2018</value>
+    </Data>
+    <Data name='area_m2'>
+      <value>164023.3521912165</value>
+    </Data>
+    <Data name='count'>
+      <value>408</value>
+    </Data>
+    <Data name='system:index'>
+      <value>+21256+28445</value>
+    </Data>
+    <Data name='agua'>
+      <value>1</value>
+    </Data>
+  </ExtendedData>
+  <MultiGeometry>
+    <Polygon>
+      <outerBoundaryIs>
+        <LinearRing>
+          <coordinates>-75.67543735075212,5.146519876298408 -75.67543620592114,5.1454343622869905 -75.67525576123121,5.145434553547298 -75.67525385424261,5.143625363381543 -75.67543429842051,5.143625172193101 -75.67543391700482,5.14326333416534 -75.67561436107492,5.143263142931982 -75.67561417032665,5.143082223922593 -75.67579461434285,5.14308203264432 -75.67579442354968,5.142901113643914 -75.67597486750299,5.142900922320725 -75.6759746766649,5.142720003329302 -75.6761551205643,5.142719811961197 -75.67615492968129,5.142538892969775 -75.67651581735436,5.1425385101078005 -75.67651562637253,5.142357591125361 -75.67723740143121,5.142356824808525 -75.67723721026074,5.142175905853034 -75.67741765395355,5.142175714152553 -75.67741784517793,5.14235663309906 -75.6779591763821,5.142356057674221 -75.67795936776818,5.142536976602762 -75.67850069906218,5.142536400692833 -75.67850050752341,5.142355481791242 -75.67868095122519,5.142355289722452 -75.6786807596415,5.14217437082086 -75.67886120328939,5.142174178716137 -75.67886082004114,5.141812340921938 -75.67904126358123,5.141812148781281 -75.67904088026111,5.141450310996065 -75.67922132368442,5.141450118810494 -75.67922074860094,5.140907362159619 -75.67940119187153,5.140907169938115 -75.67940080841667,5.140545332179848 -75.6795812515705,5.140545139931395 -75.67958086804377,5.140183302173128 -75.67976131108979,5.140183109879758 -75.67976111928151,5.1400021910141 -75.67994156227363,5.140001998675814 -75.6799411785852,5.139640160944498 -75.68012162146952,5.139639968570279 -75.6801210458291,5.13909721199127 -75.68030148855172,5.1390970195901025 -75.68030129663563,5.138916100724444 -75.68048173929539,5.138915908287344 -75.68048135538238,5.138554070573993 -75.68066179793432,5.138553878091977 -75.6806616059374,5.138372959244285 -75.68084204843545,5.138372766717353 -75.6808418563936,5.138191847878645 -75.68102229883775,5.138191655306797 -75.68102210675099,5.138010736477071 -75.68120254913227,5.138010543860307 -75.68120235700059,5.137829625030582 -75.68138279932795,5.137829432368902 -75.68138260715136,5.13764851354816 -75.68156304942484,5.137648320841565 -75.68156285720333,5.137467402020823 -75.68174329941391,5.137467209278295 -75.6817431071475,5.137286290457553 -75.68192354930417,5.13728609767011 -75.68192335699284,5.1371051788583495 -75.68210379908665,5.137104986025991 -75.6821034144011,5.136743148420438 -75.6822838563871,5.136742955552147 -75.68228270215975,5.1356574427534545 -75.68210226047918,5.1356576355858135 -75.68210149134163,5.134933960347758 -75.68192104985869,5.134934153099269 -75.68192028103554,5.134210477816298 -75.68210072231189,5.134210285091736 -75.68209995338994,5.133486609808766 -75.68228039445965,5.133486417057255 -75.68228000994479,5.133124579433736 -75.68246045089772,5.133124386646293 -75.68246025860437,5.132943467834534 -75.68264069950341,5.132943275002175 -75.68264050715614,5.1327623561993985 -75.68282094801026,5.132762163322123 -75.68282075561808,5.132581244519347 -75.68300119640932,5.13258105160614 -75.68300100397222,5.1324001328123465 -75.6831814447006,5.13239993984524 -75.68318086729047,5.131857183481827 -75.68263954553657,5.131857762158567 -75.68263973784791,5.132038680970326 -75.6824592972004,5.132038873766753 -75.68245948946681,5.132219792587495 -75.68227904875641,5.132219985339006 -75.68227924097792,5.1324009041597485 -75.68191835944035,5.132401289528022 -75.68191855157201,5.132582208357748 -75.68173811074483,5.132582400974512 -75.68173830282261,5.13276331981322 -75.68155786194153,5.1327635123850675 -75.68155805398337,5.13294443123276 -75.68137761303042,5.132944623759691 -75.68137799703325,5.133306461455076 -75.6811975559815,5.133306653946075 -75.68119832385243,5.134030329363793 -75.68101788259405,5.134030521827843 -75.6810190343061,5.135116034958911 -75.6811994758789,5.135115842458929 -75.68119985993563,5.135477680145331 -75.68138030159824,5.135477487573484 -75.68138049369398,5.135658406412192 -75.6815609354015,5.135658213786446 -75.68156112755115,5.135839132607189 -75.6817415693036,5.1358389399275435 -75.68174195371965,5.136200777569028 -75.6815615118684,5.13620097026664 -75.68156208839815,5.136743726737852 -75.6813816463852,5.136743919408514 -75.6813820306755,5.137105757067966 -75.68120158855474,5.137105949693712 -75.68120178065048,5.137286868532421 -75.68102133847583,5.137287061122235 -75.68102153053565,5.1374679799609435 -75.68084108829811,5.137468172505842 -75.68084128031299,5.137649091353534 -75.68048039571217,5.1376494762995994 -75.68048058763722,5.137830395156275 -75.68030014527392,5.137830587557443 -75.68030052903421,5.13819242528876 -75.68012008656311,5.138192617653995 -75.68012047025154,5.138554455394295 -75.67994002767264,5.138554647723597 -75.67994021947194,5.138735566589255 -75.67975977683915,5.138735758882625 -75.67976016036587,5.139097596631909 -75.67957971761629,5.139097788880362 -75.67957990933475,5.139278707763987 -75.67939946654026,5.139278899967525 -75.6794000415878,5.139821656636366 -75.67885871268331,5.139822233004436 -75.67885890423108,5.14000315191501 -75.67867846119404,5.140003343938885 -75.67867884420873,5.140365181760034 -75.67849840106389,5.140365373747976 -75.67849878399774,5.140727211587091 -75.67831834074511,5.140727403539101 -75.67831853217609,5.140908322458658 -75.67795764555405,5.140908706227931 -75.67795783688622,5.1410896251564715 -75.67759695012943,5.141090008737097 -75.67759714137176,5.141270927683604 -75.67777758479508,5.141270735911258 -75.67777777609132,5.141451654848781 -75.67759733261411,5.141451846630111 -75.67759771511676,5.141813684514141 -75.67669549710189,5.141814642693157 -75.67669530610209,5.141633723710717 -75.67651486253504,5.1416339151866195 -75.67651505348094,5.141814834178042 -75.67615416621211,5.141815216986117 -75.67615435706819,5.141996135986523 -75.6756130259718,5.14199670983931 -75.67561321667515,5.142177628857682 -75.6752523291458,5.1421780111806665 -75.67525271037285,5.142539849235377 -75.6750722664914,5.142540040342971 -75.67507264765555,5.142901878406665 -75.6748922036663,5.142902069469343 -75.67489353758366,5.144168502714728 -75.67471309323507,5.144168693777406 -75.67471366486004,5.144711450886421 -75.67453322034977,5.144711641913166 -75.67453398240859,5.145435318076486 -75.67471442712548,5.145435127022791 -75.67471499889417,5.14597788411384 -75.67489544376377,5.145977692979297 -75.67489582507166,5.146339531025025 -75.67525671498153,5.146339148594242 -75.67525690575675,5.146520067594648 -75.67543735075212,5.146519876298408 </coordinates>
+        </LinearRing>
+      </outerBoundaryIs>
+    </Polygon>
+    <Polygon>
+      <outerBoundaryIs>
+        <LinearRing>
+          <coordinates>-75.67543735075212,5.146519876298408 -75.67543754158123,5.1467007952898305 -75.67561798661252,5.146700603930709 -75.67561779573849,5.146519684948269 -75.67543735075212,5.146519876298408 </coordinates>
+        </LinearRing>
+      </outerBoundaryIs>
+    </Polygon>
+  </MultiGeometry>
+</Placemark><Placemark>
+  <ExtendedData>
+    <Data name='proyecto'>
+      <value>AlennaArtCode / 2026</value>
+    </Data>
+    <Data name='version'>
+      <value>v10</value>
+    </Data>
+    <Data name='metodo'>
+      <value>Mediana-sin-SCL|MNDWI&gt;=0.05|NIR&lt;0.15|SWIR&lt;0.1|20m|EPSG:32618</value>
+    </Data>
+    <Data name='satelite'>
+      <value>Sentinel-2 MSI 20m</value>
+    </Data>
+    <Data name='rio'>
+      <value>Rio Chinchina</value>
+    </Data>
+    <Data name='anno'>
+      <value>2018</value>
+    </Data>
+    <Data name='area_m2'>
+      <value>804.038330073576</value>
+    </Data>
+    <Data name='count'>
+      <value>2</value>
+    </Data>
+    <Data name='system:index'>
+      <value>+21258+28247</value>
+    </Data>
+    <Data name='agua'>
+      <value>1</value>
+    </Data>
+  </ExtendedData>
+  <MultiGeometry>
+    <Polygon>
+      <outerBoundaryIs>
+        <LinearRing>
+          <coordinates>-75.67503883081024,5.11069827435266 -75.6750386414364,5.1105173551366585 -75.6748582065381,5.11051754498661 -75.67485839585804,5.110698464211596 -75.67503883081024,5.11069827435266 </coordinates>
+        </LinearRing>
+      </outerBoundaryIs>
+    </Polygon>
+    <Polygon>
+      <outerBoundaryIs>
+        <LinearRing>
+          <coordinates>-75.67503883081024,5.11069827435266 -75.67503902019307,5.110879193568661 -75.67521945519019,5.110879003646844 -75.67521926575346,5.110698084439826 -75.67503883081024,5.11069827435266 </coordinates>
+        </LinearRing>
+      </outerBoundaryIs>
+    </Polygon>
+  </MultiGeometry>
+</Placemark><Placemark>
+  <ExtendedData>
+    <Data name='proyecto'>
+      <value>AlennaArtCode / 2026</value>
+    </Data>
+    <Data name='version'>
+      <value>v10</value>
+    </Data>
+    <Data name='metodo'>
+      <value>Mediana-sin-SCL|MNDWI&gt;=0.05|NIR&lt;0.15|SWIR&lt;0.1|20m|EPSG:32618</value>
+    </Data>
+    <Data name='satelite'>
+      <value>Sentinel-2 MSI 20m</value>
+    </Data>
+    <Data name='rio'>
+      <value>Rio Chinchina</value>
+    </Data>
+    <Data name='anno'>
+      <value>2018</value>
+    </Data>
+    <Data name='area_m2'>
+      <value>2412.11492080473</value>
+    </Data>
+    <Data name='count'>
+      <value>6</value>
+    </Data>
+    <Data name='system:index'>
+      <value>+21260+28257</value>
+    </Data>
+    <Data name='agua'>
+      <value>1</value>
+    </Data>
+  </ExtendedData>
+  <MultiGeometry>
+    <Polygon>
+      <outerBoundaryIs>
+        <LinearRing>
+          <coordinates>-75.67504034605253,5.112145628035756 -75.67485991069609,5.112145817957574 -75.67486010007892,5.112326737164591 -75.67467966465959,5.112326927041493 -75.67468004335339,5.112688765473496 -75.67486047887152,5.112688575587611 -75.67486028947073,5.112507656380593 -75.67504072492599,5.1125074664497925 -75.67504034605253,5.112145628035756 </coordinates>
+        </LinearRing>
+      </outerBoundaryIs>
+    </Polygon>
+    <Polygon>
+      <outerBoundaryIs>
+        <LinearRing>
+          <coordinates>-75.67504034605253,5.112145628035756 -75.67522078139999,5.112145438078006 -75.67522040244569,5.111783599672952 -75.67503996719704,5.111783789621719 -75.67504034605253,5.112145628035756 </coordinates>
+        </LinearRing>
+      </outerBoundaryIs>
+    </Polygon>
+  </MultiGeometry>
+</Placemark><Placemark>
+  <ExtendedData>
+    <Data name='proyecto'>
+      <value>AlennaArtCode / 2026</value>
+    </Data>
+    <Data name='version'>
+      <value>v10</value>
+    </Data>
+    <Data name='metodo'>
+      <value>Mediana-sin-SCL|MNDWI&gt;=0.05|NIR&lt;0.15|SWIR&lt;0.1|20m|EPSG:32618</value>
+    </Data>
+    <Data name='satelite'>
+      <value>Sentinel-2 MSI 20m</value>
+    </Data>
+    <Data name='rio'>
+      <value>Rio Chinchina</value>
+    </Data>
+    <Data name='anno'>
+      <value>2018</value>
+    </Data>
+    <Data name='area_m2'>
+      <value>402.0192288367297</value>
+    </Data>
+    <Data name='count'>
+      <value>1</value>
+    </Data>
+    <Data name='system:index'>
+      <value>+21262+28261</value>
+    </Data>
+    <Data name='agua'>
+      <value>1</value>
+    </Data>
+  </ExtendedData>
+  <Polygon>
+    <outerBoundaryIs>
+      <LinearRing>
+        <coordinates>-75.6745003650881,5.113412632196437 -75.67450017575916,5.113231712980435 -75.67431974007933,5.113231902776489 -75.67431992935435,5.113412822010456 -75.6745003650881,5.113412632196437 </coordinates>
+      </LinearRing>
+    </outerBoundaryIs>
+  </Polygon>
+</Placemark><Placemark>
+  <ExtendedData>
+    <Data name='proyecto'>
+      <value>AlennaArtCode / 2026</value>
+    </Data>
+    <Data name='version'>
+      <value>v10</value>
+    </Data>
+    <Data name='metodo'>
+      <value>Mediana-sin-SCL|MNDWI&gt;=0.05|NIR&lt;0.15|SWIR&lt;0.1|20m|EPSG:32618</value>
+    </Data>
+    <Data name='satelite'>
+      <value>Sentinel-2 MSI 20m</value>
+    </Data>
+    <Data name='rio'>
+      <value>Rio Chinchina</value>
+    </Data>
+    <Data name='anno'>
+      <value>2018</value>
+    </Data>
+    <Data name='area_m2'>
+      <value>804.0386571426435</value>
+    </Data>
+    <Data name='count'>
+      <value>2</value>
+    </Data>
+    <Data name='system:index'>
+      <value>+21263+28241</value>
+    </Data>
+    <Data name='agua'>
+      <value>1</value>
+    </Data>
+  </ExtendedData>
+  <MultiGeometry>
+    <Polygon>
+      <outerBoundaryIs>
+        <LinearRing>
+          <coordinates>-75.67413552136027,5.1096137076326755 -75.67413533227388,5.109432788380741 -75.67395489764507,5.10943297793425 -75.67395508667757,5.109613897195167 -75.67413552136027,5.1096137076326755 </coordinates>
+        </LinearRing>
+      </outerBoundaryIs>
+    </Polygon>
+    <Polygon>
+      <outerBoundaryIs>
+        <LinearRing>
+          <coordinates>-75.67413552136027,5.1096137076326755 -75.67413571044665,5.10979462688461 -75.67431614517427,5.10979443726822 -75.674315956034,5.109613518016285 -75.67413552136027,5.1096137076326755 </coordinates>
+        </LinearRing>
+      </outerBoundaryIs>
+    </Polygon>
+  </MultiGeometry>
+</Placemark><Placemark>
+  <ExtendedData>
+    <Data name='proyecto'>
+      <value>AlennaArtCode / 2026</value>
+    </Data>
+    <Data name='version'>
+      <value>v10</value>
+    </Data>
+    <Data name='metodo'>
+      <value>Mediana-sin-SCL|MNDWI&gt;=0.05|NIR&lt;0.15|SWIR&lt;0.1|20m|EPSG:32618</value>
+    </Data>
+    <Data name='satelite'>
+      <value>Sentinel-2 MSI 20m</value>
+    </Data>
+    <Data name='rio'>
+      <value>Rio Chinchina</value>
+    </Data>
+    <Data name='anno'>
+      <value>2018</value>
+    </Data>
+    <Data name='area_m2'>
+      <value>1206.0573073341975</value>
+    </Data>
+    <Data name='count'>
+      <value>3</value>
+    </Data>
+    <Data name='system:index'>
+      <value>+21264+28322</value>
+    </Data>
+    <Data name='agua'>
+      <value>1</value>
+    </Data>
+  </ExtendedData>
+  <Polygon>
+    <outerBoundaryIs>
+      <LinearRing>
+        <coordinates>-75.67415104904538,5.124449083111233 -75.67415048016028,5.123906325597976 -75.6739700414711,5.123906515690473 -75.67397061021246,5.124449273230679 -75.67415104904538,5.124449083111233 </coordinates>
+      </LinearRing>
+    </outerBoundaryIs>
+  </Polygon>
+</Placemark><Placemark>
+  <ExtendedData>
+    <Data name='proyecto'>
+      <value>AlennaArtCode / 2026</value>
+    </Data>
+    <Data name='version'>
+      <value>v10</value>
+    </Data>
+    <Data name='metodo'>
+      <value>Mediana-sin-SCL|MNDWI&gt;=0.05|NIR&lt;0.15|SWIR&lt;0.1|20m|EPSG:32618</value>
+    </Data>
+    <Data name='satelite'>
+      <value>Sentinel-2 MSI 20m</value>
+    </Data>
+    <Data name='rio'>
+      <value>Rio Chinchina</value>
+    </Data>
+    <Data name='anno'>
+      <value>2018</value>
+    </Data>
+    <Data name='area_m2'>
+      <value>804.0381149314003</value>
+    </Data>
+    <Data name='count'>
+      <value>2</value>
+    </Data>
+    <Data name='system:index'>
+      <value>+21266+28350</value>
+    </Data>
+    <Data name='agua'>
+      <value>1</value>
+    </Data>
+  </ExtendedData>
+  <Polygon>
+    <outerBoundaryIs>
+      <LinearRing>
+        <coordinates>-75.67397592137581,5.129515009805483 -75.67397573159772,5.129334090661347 -75.67361485115609,5.129334471106853 -75.67361504083537,5.129515390268955 -75.67397592137581,5.129515009805483 </coordinates>
+      </LinearRing>
+    </outerBoundaryIs>
+  </Polygon>
+</Placemark><Placemark>
+  <ExtendedData>
+    <Data name='proyecto'>
+      <value>AlennaArtCode / 2026</value>
+    </Data>
+    <Data name='version'>
+      <value>v10</value>
+    </Data>
+    <Data name='metodo'>
+      <value>Mediana-sin-SCL|MNDWI&gt;=0.05|NIR&lt;0.15|SWIR&lt;0.1|20m|EPSG:32618</value>
+    </Data>
+    <Data name='satelite'>
+      <value>Sentinel-2 MSI 20m</value>
+    </Data>
+    <Data name='rio'>
+      <value>Rio Chinchina</value>
+    </Data>
+    <Data name='anno'>
+      <value>2018</value>
+    </Data>
+    <Data name='area_m2'>
+      <value>1206.0581821758724</value>
+    </Data>
+    <Data name='count'>
+      <value>3</value>
+    </Data>
+    <Data name='system:index'>
+      <value>+21269+28275</value>
+    </Data>
+    <Data name='agua'>
+      <value>1</value>
+    </Data>
+  </ExtendedData>
+  <Polygon>
+    <outerBoundaryIs>
+      <LinearRing>
+        <coordinates>-75.67323996111031,5.115946829442487 -75.67323939394099,5.115404071677702 -75.67305895760539,5.115404261204261 -75.67305952462199,5.115947018987012 -75.67323996111031,5.115946829442487 </coordinates>
+      </LinearRing>
+    </outerBoundaryIs>
+  </Polygon>
+</Placemark><Placemark>
+  <ExtendedData>
+    <Data name='proyecto'>
+      <value>AlennaArtCode / 2026</value>
+    </Data>
+    <Data name='version'>
+      <value>v10</value>
+    </Data>
+    <Data name='metodo'>
+      <value>Mediana-sin-SCL|MNDWI&gt;=0.05|NIR&lt;0.15|SWIR&lt;0.1|20m|EPSG:32618</value>
+    </Data>
+    <Data name='satelite'>
+      <value>Sentinel-2 MSI 20m</value>
+    </Data>
+    <Data name='rio'>
+      <value>Rio Chinchina</value>
+    </Data>
+    <Data name='anno'>
+      <value>2018</value>
+    </Data>
+    <Data name='area_m2'>
+      <value>804.0388360025933</value>
+    </Data>
+    <Data name='count'>
+      <value>2</value>
+    </Data>
+    <Data name='system:index'>
+      <value>+21270+28278</value>
+    </Data>
+    <Data name='agua'>
+      <value>1</value>
+    </Data>
+  </ExtendedData>
+  <Polygon>
+    <outerBoundaryIs>
+      <LinearRing>
+        <coordinates>-75.67306009170149,5.116489776769764 -75.6730597136455,5.11612793824793 -75.6728792770943,5.116128127756522 -75.67287965506046,5.1164899662873395 -75.67306009170149,5.116489776769764 </coordinates>
+      </LinearRing>
+    </outerBoundaryIs>
+  </Polygon>
+</Placemark><Placemark>
+  <ExtendedData>
+    <Data name='proyecto'>
+      <value>AlennaArtCode / 2026</value>
+    </Data>
+    <Data name='version'>
+      <value>v10</value>
+    </Data>
+    <Data name='metodo'>
+      <value>Mediana-sin-SCL|MNDWI&gt;=0.05|NIR&lt;0.15|SWIR&lt;0.1|20m|EPSG:32618</value>
+    </Data>
+    <Data name='satelite'>
+      <value>Sentinel-2 MSI 20m</value>
+    </Data>
+    <Data name='rio'>
+      <value>Rio Chinchina</value>
+    </Data>
+    <Data name='anno'>
+      <value>2018</value>
+    </Data>
+    <Data name='area_m2'>
+      <value>1206.0580617098856</value>
+    </Data>
+    <Data name='count'>
+      <value>3</value>
+    </Data>
+    <Data name='system:index'>
+      <value>+21270+28307</value>
+    </Data>
+    <Data name='agua'>
+      <value>1</value>
+    </Data>
+  </ExtendedData>
+  <MultiGeometry>
+    <Polygon>
+      <outerBoundaryIs>
+        <LinearRing>
+          <coordinates>-75.67288494935345,5.121555705260644 -75.67288476017723,5.121374786026677 -75.67252388412835,5.12137516526844 -75.67252407319677,5.121556084520375 -75.67288494935345,5.121555705260644 </coordinates>
+        </LinearRing>
+      </outerBoundaryIs>
+    </Polygon>
+    <Polygon>
+      <outerBoundaryIs>
+        <LinearRing>
+          <coordinates>-75.67288494935345,5.121555705260644 -75.67288513852967,5.121736624494613 -75.67306557664392,5.121736434779407 -75.67306538741381,5.121555515554423 -75.67288494935345,5.121555705260644 </coordinates>
+        </LinearRing>
+      </outerBoundaryIs>
+    </Polygon>
+  </MultiGeometry>
+</Placemark><Placemark>
+  <ExtendedData>
+    <Data name='proyecto'>
+      <value>AlennaArtCode / 2026</value>
+    </Data>
+    <Data name='version'>
+      <value>v10</value>
+    </Data>
+    <Data name='metodo'>
+      <value>Mediana-sin-SCL|MNDWI&gt;=0.05|NIR&lt;0.15|SWIR&lt;0.1|20m|EPSG:32618</value>
+    </Data>
+    <Data name='satelite'>
+      <value>Sentinel-2 MSI 20m</value>
+    </Data>
+    <Data name='rio'>
+      <value>Rio Chinchina</value>
+    </Data>
+    <Data name='anno'>
+      <value>2018</value>
+    </Data>
+    <Data name='area_m2'>
+      <value>1206.057808401536</value>
+    </Data>
+    <Data name='count'>
+      <value>3</value>
+    </Data>
+    <Data name='system:index'>
+      <value>+21271+28323</value>
+    </Data>
+    <Data name='agua'>
+      <value>1</value>
+    </Data>
+  </ExtendedData>
+  <Polygon>
+    <outerBoundaryIs>
+      <LinearRing>
+        <coordinates>-75.67324904418275,5.124630952403445 -75.67324885479096,5.1244500332054095 -75.67270753815744,5.124450602647468 -75.67270772739654,5.124631521872453 -75.67324904418275,5.124630952403445 </coordinates>
+      </LinearRing>
+    </outerBoundaryIs>
+  </Polygon>
+</Placemark><Placemark>
+  <ExtendedData>
+    <Data name='proyecto'>
+      <value>AlennaArtCode / 2026</value>
+    </Data>
+    <Data name='version'>
+      <value>v10</value>
+    </Data>
+    <Data name='metodo'>
+      <value>Mediana-sin-SCL|MNDWI&gt;=0.05|NIR&lt;0.15|SWIR&lt;0.1|20m|EPSG:32618</value>
+    </Data>
+    <Data name='satelite'>
+      <value>Sentinel-2 MSI 20m</value>
+    </Data>
+    <Data name='rio'>
+      <value>Rio Chinchina</value>
+    </Data>
+    <Data name='anno'>
+      <value>2018</value>
+    </Data>
+    <Data name='area_m2'>
+      <value>402.019502713743</value>
+    </Data>
+    <Data name='count'>
+      <value>1</value>
+    </Data>
+    <Data name='system:index'>
+      <value>+21274+28287</value>
+    </Data>
+    <Data name='agua'>
+      <value>1</value>
+    </Data>
+  </ExtendedData>
+  <Polygon>
+    <outerBoundaryIs>
+      <LinearRing>
+        <coordinates>-75.67234004486666,5.11811880804459 -75.67233985597791,5.117937888765707 -75.6721594188967,5.117938078139551 -75.67215960774054,5.118118997418435 -75.67234004486666,5.11811880804459 </coordinates>
+      </LinearRing>
+    </outerBoundaryIs>
+  </Polygon>
+</Placemark><Placemark>
+  <ExtendedData>
+    <Data name='proyecto'>
+      <value>AlennaArtCode / 2026</value>
+    </Data>
+    <Data name='version'>
+      <value>v10</value>
+    </Data>
+    <Data name='metodo'>
+      <value>Mediana-sin-SCL|MNDWI&gt;=0.05|NIR&lt;0.15|SWIR&lt;0.1|20m|EPSG:32618</value>
+    </Data>
+    <Data name='satelite'>
+      <value>Sentinel-2 MSI 20m</value>
+    </Data>
+    <Data name='rio'>
+      <value>Rio Chinchina</value>
+    </Data>
+    <Data name='anno'>
+      <value>2018</value>
+    </Data>
+    <Data name='area_m2'>
+      <value>402.01951521181314</value>
+    </Data>
+    <Data name='count'>
+      <value>1</value>
+    </Data>
+    <Data name='system:index'>
+      <value>+21275+28289</value>
+    </Data>
+    <Data name='agua'>
+      <value>1</value>
+    </Data>
+  </ExtendedData>
+  <Polygon>
+    <outerBoundaryIs>
+      <LinearRing>
+        <coordinates>-75.6721599854372,5.118480835976202 -75.67215979658438,5.118299916697318 -75.67197935939538,5.118300106035231 -75.67197954820328,5.118481025314114 -75.6721599854372,5.118480835976202 </coordinates>
+      </LinearRing>
+    </outerBoundaryIs>
+  </Polygon>
+</Placemark><Placemark>
+  <ExtendedData>
+    <Data name='proyecto'>
+      <value>AlennaArtCode / 2026</value>
+    </Data>
+    <Data name='version'>
+      <value>v10</value>
+    </Data>
+    <Data name='metodo'>
+      <value>Mediana-sin-SCL|MNDWI&gt;=0.05|NIR&lt;0.15|SWIR&lt;0.1|20m|EPSG:32618</value>
+    </Data>
+    <Data name='satelite'>
+      <value>Sentinel-2 MSI 20m</value>
+    </Data>
+    <Data name='rio'>
+      <value>Rio Chinchina</value>
+    </Data>
+    <Data name='anno'>
+      <value>2018</value>
+    </Data>
+    <Data name='area_m2'>
+      <value>402.0194066464999</value>
+    </Data>
+    <Data name='count'>
+      <value>1</value>
+    </Data>
+    <Data name='system:index'>
+      <value>+21276+28340</value>
+    </Data>
+    <Data name='agua'>
+      <value>1</value>
+    </Data>
+  </ExtendedData>
+  <Polygon>
+    <outerBoundaryIs>
+      <LinearRing>
+        <coordinates>-75.67198918621,5.127707907558011 -75.67198899706072,5.127526988324043 -75.6718085572756,5.127527177949416 -75.67180874637995,5.127708097192367 -75.67198918621,5.127707907558011 </coordinates>
+      </LinearRing>
+    </outerBoundaryIs>
+  </Polygon>
+</Placemark><Placemark>
+  <ExtendedData>
+    <Data name='proyecto'>
+      <value>AlennaArtCode / 2026</value>
+    </Data>
+    <Data name='version'>
+      <value>v10</value>
+    </Data>
+    <Data name='metodo'>
+      <value>Mediana-sin-SCL|MNDWI&gt;=0.05|NIR&lt;0.15|SWIR&lt;0.1|20m|EPSG:32618</value>
+    </Data>
+    <Data name='satelite'>
+      <value>Sentinel-2 MSI 20m</value>
+    </Data>
+    <Data name='rio'>
+      <value>Rio Chinchina</value>
+    </Data>
+    <Data name='anno'>
+      <value>2018</value>
+    </Data>
+    <Data name='area_m2'>
+      <value>804.0390109214184</value>
+    </Data>
+    <Data name='count'>
+      <value>2</value>
+    </Data>
+    <Data name='system:index'>
+      <value>+21278+28326</value>
+    </Data>
+    <Data name='agua'>
+      <value>1</value>
+    </Data>
+  </ExtendedData>
+  <Polygon>
+    <outerBoundaryIs>
+      <LinearRing>
+        <coordinates>-75.67162566048138,5.125175417209816 -75.6716252825781,5.124813578687981 -75.67144484354756,5.124813768106741 -75.67144522134303,5.125175606646542 -75.67162566048138,5.125175417209816 </coordinates>
+      </LinearRing>
+    </outerBoundaryIs>
+  </Polygon>
+</Placemark><Placemark>
+  <ExtendedData>
+    <Data name='proyecto'>
+      <value>AlennaArtCode / 2026</value>
+    </Data>
+    <Data name='version'>
+      <value>v10</value>
+    </Data>
+    <Data name='metodo'>
+      <value>Mediana-sin-SCL|MNDWI&gt;=0.05|NIR&lt;0.15|SWIR&lt;0.1|20m|EPSG:32618</value>
+    </Data>
+    <Data name='satelite'>
+      <value>Sentinel-2 MSI 20m</value>
+    </Data>
+    <Data name='rio'>
+      <value>Rio Chinchina</value>
+    </Data>
+    <Data name='anno'>
+      <value>2018</value>
+    </Data>
+    <Data name='area_m2'>
+      <value>804.0391044517434</value>
+    </Data>
+    <Data name='count'>
+      <value>2</value>
+    </Data>
+    <Data name='system:index'>
+      <value>+21280+28332</value>
+    </Data>
+    <Data name='agua'>
+      <value>1</value>
+    </Data>
+  </ExtendedData>
+  <Polygon>
+    <outerBoundaryIs>
+      <LinearRing>
+        <coordinates>-75.67126591545636,5.126261311657756 -75.67126553767885,5.125899473117955 -75.67108509832491,5.1258996624738336 -75.67108547600361,5.126261501031601 -75.67126591545636,5.126261311657756 </coordinates>
+      </LinearRing>
+    </outerBoundaryIs>
+  </Polygon>
+</Placemark><Placemark>
+  <ExtendedData>
+    <Data name='proyecto'>
+      <value>AlennaArtCode / 2026</value>
+    </Data>
+    <Data name='version'>
+      <value>v10</value>
+    </Data>
+    <Data name='metodo'>
+      <value>Mediana-sin-SCL|MNDWI&gt;=0.05|NIR&lt;0.15|SWIR&lt;0.1|20m|EPSG:32618</value>
+    </Data>
+    <Data name='satelite'>
+      <value>Sentinel-2 MSI 20m</value>
+    </Data>
+    <Data name='rio'>
+      <value>Rio Chinchina</value>
+    </Data>
+    <Data name='anno'>
+      <value>2018</value>
+    </Data>
+    <Data name='area_m2'>
+      <value>1608.0822368890606</value>
+    </Data>
+    <Data name='count'>
+      <value>4</value>
+    </Data>
+    <Data name='system:index'>
+      <value>+21285+28033</value>
+    </Data>
+    <Data name='agua'>
+      <value>1</value>
+    </Data>
+  </ExtendedData>
+  <Polygon>
+    <outerBoundaryIs>
+      <LinearRing>
+        <coordinates>-75.67084888881827,5.072166779252979 -75.67084870204056,5.071985859659685 -75.67012700473106,5.071986608387508 -75.67012719130216,5.072167528007752 -75.67084888881827,5.072166779252979 </coordinates>
+      </LinearRing>
+    </outerBoundaryIs>
+  </Polygon>
+</Placemark><Placemark>
+  <ExtendedData>
+    <Data name='proyecto'>
+      <value>AlennaArtCode / 2026</value>
+    </Data>
+    <Data name='version'>
+      <value>v10</value>
+    </Data>
+    <Data name='metodo'>
+      <value>Mediana-sin-SCL|MNDWI&gt;=0.05|NIR&lt;0.15|SWIR&lt;0.1|20m|EPSG:32618</value>
+    </Data>
+    <Data name='satelite'>
+      <value>Sentinel-2 MSI 20m</value>
+    </Data>
+    <Data name='rio'>
+      <value>Rio Chinchina</value>
+    </Data>
+    <Data name='anno'>
+      <value>2018</value>
+    </Data>
+    <Data name='area_m2'>
+      <value>1206.0600189169404</value>
+    </Data>
+    <Data name='count'>
+      <value>3</value>
+    </Data>
+    <Data name='system:index'>
+      <value>+21286+28241</value>
+    </Data>
+    <Data name='agua'>
+      <value>1</value>
+    </Data>
+  </ExtendedData>
+  <MultiGeometry>
+    <Polygon>
+      <outerBoundaryIs>
+        <LinearRing>
+          <coordinates>-75.66998552195129,5.109618054822881 -75.6699853340417,5.10943713540925 -75.66980489925119,5.109437323803931 -75.66980508711588,5.109618243226545 -75.66998552195129,5.109618054822881 </coordinates>
+        </LinearRing>
+      </outerBoundaryIs>
+    </Polygon>
+    <Polygon>
+      <outerBoundaryIs>
+        <LinearRing>
+          <coordinates>-75.66998552195129,5.109618054822881 -75.66998570987884,5.1097989742365115 -75.67034657963053,5.109798597267486 -75.67034639161314,5.109617677871821 -75.66998552195129,5.109618054822881 </coordinates>
+        </LinearRing>
+      </outerBoundaryIs>
+    </Polygon>
+  </MultiGeometry>
+</Placemark><Placemark>
+  <ExtendedData>
+    <Data name='proyecto'>
+      <value>AlennaArtCode / 2026</value>
+    </Data>
+    <Data name='version'>
+      <value>v10</value>
+    </Data>
+    <Data name='metodo'>
+      <value>Mediana-sin-SCL|MNDWI&gt;=0.05|NIR&lt;0.15|SWIR&lt;0.1|20m|EPSG:32618</value>
+    </Data>
+    <Data name='satelite'>
+      <value>Sentinel-2 MSI 20m</value>
+    </Data>
+    <Data name='rio'>
+      <value>Rio Chinchina</value>
+    </Data>
+    <Data name='anno'>
+      <value>2018</value>
+    </Data>
+    <Data name='area_m2'>
+      <value>402.0207442466269</value>
+    </Data>
+    <Data name='count'>
+      <value>1</value>
+    </Data>
+    <Data name='system:index'>
+      <value>+21299+28120</value>
+    </Data>
+    <Data name='agua'>
+      <value>1</value>
+    </Data>
+  </ExtendedData>
+  <Polygon>
+    <outerBoundaryIs>
+      <LinearRing>
+        <coordinates>-75.66779787427824,5.087909966070591 -75.667797687779,5.087729046450348 -75.66761725897128,5.087729233434675 -75.66761744542559,5.087910153054918 -75.66779787427824,5.087909966070591 </coordinates>
+      </LinearRing>
+    </outerBoundaryIs>
+  </Polygon>
+</Placemark><Placemark>
+  <ExtendedData>
+    <Data name='proyecto'>
+      <value>AlennaArtCode / 2026</value>
+    </Data>
+    <Data name='version'>
+      <value>v10</value>
+    </Data>
+    <Data name='metodo'>
+      <value>Mediana-sin-SCL|MNDWI&gt;=0.05|NIR&lt;0.15|SWIR&lt;0.1|20m|EPSG:32618</value>
+    </Data>
+    <Data name='satelite'>
+      <value>Sentinel-2 MSI 20m</value>
+    </Data>
+    <Data name='rio'>
+      <value>Rio Chinchina</value>
+    </Data>
+    <Data name='anno'>
+      <value>2018</value>
+    </Data>
+    <Data name='area_m2'>
+      <value>804.0483375274807</value>
+    </Data>
+    <Data name='count'>
+      <value>2</value>
+    </Data>
+    <Data name='system:index'>
+      <value>+21412+28070</value>
+    </Data>
+    <Data name='agua'>
+      <value>1</value>
+    </Data>
+  </ExtendedData>
+  <Polygon>
+    <outerBoundaryIs>
+      <LinearRing>
+        <coordinates>-75.6475807656303,5.078884575980856 -75.64758058509588,5.078703655579078 -75.64721973101979,5.078704017528273 -75.64721991145541,5.0788849379480165 -75.6475807656303,5.078884575980856 </coordinates>
+      </LinearRing>
+    </outerBoundaryIs>
+  </Polygon>
+</Placemark><Placemark>
+  <ExtendedData>
+    <Data name='proyecto'>
+      <value>AlennaArtCode / 2026</value>
+    </Data>
+    <Data name='version'>
+      <value>v10</value>
+    </Data>
+    <Data name='metodo'>
+      <value>Mediana-sin-SCL|MNDWI&gt;=0.05|NIR&lt;0.15|SWIR&lt;0.1|20m|EPSG:32618</value>
+    </Data>
+    <Data name='satelite'>
+      <value>Sentinel-2 MSI 20m</value>
+    </Data>
+    <Data name='rio'>
+      <value>Rio Chinchina</value>
+    </Data>
+    <Data name='anno'>
+      <value>2018</value>
+    </Data>
+    <Data name='area_m2'>
+      <value>402.03223755442997</value>
+    </Data>
+    <Data name='count'>
+      <value>1</value>
+    </Data>
+    <Data name='system:index'>
+      <value>+21678+27823</value>
+    </Data>
+    <Data name='agua'>
+      <value>1</value>
+    </Data>
+  </ExtendedData>
+  <Polygon>
+    <outerBoundaryIs>
+      <LinearRing>
+        <coordinates>-75.59936541655034,5.0342433322904006 -75.59936525092796,5.034062409966228 -75.59918483458885,5.034062576019808 -75.59918500015735,5.03424349834398 -75.59936541655034,5.0342433322904006 </coordinates>
+      </LinearRing>
+    </outerBoundaryIs>
+  </Polygon>
+</Placemark><Placemark>
+  <ExtendedData>
+    <Data name='proyecto'>
+      <value>AlennaArtCode / 2026</value>
+    </Data>
+    <Data name='version'>
+      <value>v10</value>
+    </Data>
+    <Data name='metodo'>
+      <value>Mediana-sin-SCL|MNDWI&gt;=0.05|NIR&lt;0.15|SWIR&lt;0.1|20m|EPSG:32618</value>
+    </Data>
+    <Data name='satelite'>
+      <value>Sentinel-2 MSI 20m</value>
+    </Data>
+    <Data name='rio'>
+      <value>Rio Chinchina</value>
+    </Data>
+    <Data name='anno'>
+      <value>2018</value>
+    </Data>
+    <Data name='area_m2'>
+      <value>804.0645335566867</value>
+    </Data>
+    <Data name='count'>
+      <value>2</value>
+    </Data>
+    <Data name='system:index'>
+      <value>+21681+27835</value>
+    </Data>
+    <Data name='agua'>
+      <value>1</value>
+    </Data>
+  </ExtendedData>
+  <Polygon>
+    <outerBoundaryIs>
+      <LinearRing>
+        <coordinates>-75.59882615343864,5.036414898269344 -75.59882582236453,5.036053053620999 -75.5986454054595,5.036053219593731 -75.59864573643478,5.036415064251059 -75.59882615343864,5.036414898269344 </coordinates>
+      </LinearRing>
+    </outerBoundaryIs>
+  </Polygon>
+</Placemark><Placemark>
+  <ExtendedData>
+    <Data name='proyecto'>
+      <value>AlennaArtCode / 2026</value>
+    </Data>
+    <Data name='version'>
+      <value>v10</value>
+    </Data>
+    <Data name='metodo'>
+      <value>Mediana-sin-SCL|MNDWI&gt;=0.05|NIR&lt;0.15|SWIR&lt;0.1|20m|EPSG:32618</value>
+    </Data>
+    <Data name='satelite'>
+      <value>Sentinel-2 MSI 20m</value>
+    </Data>
+    <Data name='rio'>
+      <value>Rio Chinchina</value>
+    </Data>
+    <Data name='anno'>
+      <value>2018</value>
+    </Data>
+    <Data name='area_m2'>
+      <value>402.03741300292336</value>
+    </Data>
+    <Data name='count'>
+      <value>1</value>
+    </Data>
+    <Data name='system:index'>
+      <value>+21854+27599</value>
+    </Data>
+    <Data name='agua'>
+      <value>1</value>
+    </Data>
+  </ExtendedData>
+  <Polygon>
+    <outerBoundaryIs>
+      <LinearRing>
+        <coordinates>-75.5675770500048,4.9937449344638045 -75.56757689443457,4.9935640108999575 -75.56739648818353,4.993564166883424 -75.56739664369988,4.993745090456254 -75.5675770500048,4.9937449344638045 </coordinates>
+      </LinearRing>
+    </outerBoundaryIs>
+  </Polygon>
+</Placemark>
+</Document>
+</kml>
